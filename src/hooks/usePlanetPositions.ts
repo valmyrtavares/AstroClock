@@ -39,6 +39,8 @@ export function usePlanetPositions(): UsePlanetPositionsReturn {
 
   // Keep date in a ref for interval access without stale closure
   const dateRef = useRef<Date>(date);
+  const lastFetchedDateRef = useRef<Date | null>(null);
+
   useEffect(() => {
     dateRef.current = date;
   }, [date]);
@@ -59,6 +61,7 @@ export function usePlanetPositions(): UsePlanetPositionsReturn {
       const data = await response.json();
       setPlanets(data.planets);
       setError(null);
+      lastFetchedDateRef.current = targetDate;
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'An error occurred while fetching astronomical data');
@@ -86,7 +89,14 @@ export function usePlanetPositions(): UsePlanetPositionsReturn {
     }
 
     fetchTimeoutRef.current = setTimeout(() => {
-      fetchPlanets(date);
+      const timeDiff = lastFetchedDateRef.current
+        ? Math.abs(date.getTime() - lastFetchedDateRef.current.getTime())
+        : Infinity;
+
+      // Only fetch if initial load or if simulation date changed by 60 seconds (1 minute) or more
+      if (!lastFetchedDateRef.current || timeDiff >= 60000) {
+        fetchPlanets(date);
+      }
     }, 150); // Small throttle to group fast-scrubs/ticks
 
     return () => {
@@ -120,11 +130,10 @@ export function usePlanetPositions(): UsePlanetPositionsReturn {
       // Force sync with server date to avoid drift
       const currentRealDate = new Date();
       setDateState(currentRealDate);
-      fetchPlanets(currentRealDate);
     }, 60000);
 
     return () => clearInterval(syncInterval);
-  }, [isPlaying, simulationSpeed, fetchPlanets]);
+  }, [isPlaying, simulationSpeed]);
 
   return {
     planets,

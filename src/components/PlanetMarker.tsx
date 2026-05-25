@@ -67,69 +67,43 @@ export function PlanetMarker({
       }}
       id={`marker-g-${planetKey}`}
     >
-      {/* Outer Halo on selection or hover */}
-      {isHighlighted && (
-        <circle
-          r="26"
-          fill="none"
-          stroke={style.color}
-          strokeWidth="1.5"
-          className="animate-pulse"
-          strokeDasharray="4 2"
-          opacity="0.8"
-        />
-      )}
-
-      {/* Pulsing Breathing Background Glow */}
-      <circle
-        r="18"
-        fill={style.glow}
-        className={isHighlighted ? 'opacity-70 scale-110' : 'opacity-25 hover:opacity-50'}
-        style={{
-          transition: 'all 0.3s ease',
-          filter: 'blur(3px)'
-        }}
-      />
-
-      {/* Solid Center Orb */}
-      <circle
-        r="12"
-        fill="#0a0515"
-        stroke={isHighlighted ? '#ec4899' : style.color}
-        strokeWidth={isHighlighted ? 2.5 : 1.5}
-        style={{
-          boxShadow: `0 0 10px ${style.glow}`,
-          transition: 'all 0.3s ease'
-        }}
-      />
-
       {/* Planet Astrological Glyph Symbol */}
-      <text
+      <motion.text
+        animate={{ scale: isHighlighted ? 1.25 : 1 }}
+        transition={{
+          type: 'spring',
+          stiffness: 300,
+          damping: 15
+        }}
         x="0"
-        y="4"
+        y="10"
         textAnchor="middle"
-        fontSize="14"
+        fontSize="32"
         fontWeight="bold"
-        fill={isHighlighted ? '#f3eff9' : style.color}
+        fill={isHighlighted ? '#ec4899' : style.color}
+        className="select-none transition-colors duration-300"
         style={{
           fontFamily: 'sans-serif',
-          userSelect: 'none'
+          filter: isHighlighted
+            ? `drop-shadow(0 0 8px ${style.color}) drop-shadow(0 0 15px ${style.color})`
+            : `drop-shadow(0 0 3px ${style.color})`,
         }}
       >
         {style.symbol}
-      </text>
+      </motion.text>
 
       {/* Small Retrograde Flag (R_x) rendered slightly offset */}
       {data.retrograde && (
-        <g transform="translate(10, -10)">
-          <circle r="5" fill="#f97316" />
+        <g transform="translate(18, -18)">
+          <circle r="7" fill="#f97316" />
           <text
             x="0"
-            y="2"
+            y="2.5"
             textAnchor="middle"
-            fontSize="7"
+            fontSize="9"
             fontWeight="bold"
             fill="#ffffff"
+            style={{ fontFamily: 'sans-serif', userSelect: 'none' }}
           >
             ℞
           </text>
@@ -139,7 +113,7 @@ export function PlanetMarker({
       {/* Name plate visible briefly on group hover (fade-in) */}
       <text
         x="0"
-        y="-20"
+        y="-26"
         textAnchor="middle"
         fontSize="10"
         fill="#a78bfa"

@@ -193,9 +193,10 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
                 {/* Outer Sign Symbol and Name */}
                 <text
                   x={lx}
-                  y={ly + 6}
+                  y={ly + 12}
                   textAnchor="middle"
-                  className="fill-purple-300 font-medium text-lg transition-transform duration-300 group-hover:scale-125 group-hover:fill-cosmic-pink"
+                  className="fill-purple-300 font-medium transition-transform duration-300 group-hover:scale-125 group-hover:fill-cosmic-pink"
+                  style={{ fontSize: '32px' }}
                 >
                   {sign.symbol}
                 </text>
@@ -203,7 +204,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
                 {/* Inner Sign Name tooltip helper on hover (small text) */}
                 <text
                   x={lx}
-                  y={ly + 20}
+                  y={ly + 32}
                   textAnchor="middle"
                   className="fill-purple-400/0 text-[9px] tracking-wider uppercase pointer-events-none transition-all duration-300 group-hover:fill-purple-300"
                 >
