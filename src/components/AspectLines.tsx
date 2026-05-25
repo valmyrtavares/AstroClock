@@ -21,11 +21,11 @@ interface Aspect {
 }
 
 const ASPECTS_CONFIG = [
-  { type: 'conjunction', target: 0, orb: 8, color: '#fbbf24', label: 'Conjunction (0°)', dash: 'none', weight: 2 },
-  { type: 'sextile', target: 60, orb: 6, color: '#10b981', label: 'Sextile (60°)', dash: '4 4', weight: 1.5 },
-  { type: 'square', target: 90, orb: 8, color: '#f97316', label: 'Square (90°)', dash: 'none', weight: 2 },
-  { type: 'trine', target: 120, orb: 8, color: '#3b82f6', label: 'Trine (120°)', dash: 'none', weight: 2 },
-  { type: 'opposition', target: 180, orb: 8, color: '#ef4444', label: 'Opposition (180°)', dash: '6 3', weight: 2 }
+  { type: 'conjunction', target: 0, orb: 8, color: '#fbbf24', label: 'Conjunção (0°)', dash: 'none', weight: 2 },
+  { type: 'sextile', target: 60, orb: 6, color: '#10b981', label: 'Sextil (60°)', dash: '4 4', weight: 1.5 },
+  { type: 'square', target: 90, orb: 8, color: '#ef4444', label: 'Quadratura (90°)', dash: 'none', weight: 2 },
+  { type: 'trine', target: 120, orb: 8, color: '#3b82f6', label: 'Trígono (120°)', dash: 'none', weight: 2 },
+  { type: 'opposition', target: 180, orb: 8, color: '#a855f7', label: 'Oposição (180°)', dash: '6 3', weight: 2 }
 ];
 
 const CENTER = 450; // Size/2 of ZodiacWheel

@@ -5,6 +5,7 @@ import { usePlanetPositions } from '../hooks/usePlanetPositions';
 import { ZodiacWheel } from '../components/ZodiacWheel';
 import { PlanetSidebar } from '../components/PlanetSidebar';
 import { TimeControls } from '../components/TimeControls';
+import { AspectModal } from '../components/AspectModal';
 import { Compass, Sparkles, HelpCircle } from 'lucide-react';
 
 export default function Home() {
@@ -106,6 +107,15 @@ export default function Home() {
           setSimulationSpeed={setSimulationSpeed}
         />
       </footer>
+
+      {/* 4. Aspect Modal Window overlay */}
+      {selectedPlanet && (
+        <AspectModal
+          planets={planets}
+          selectedPlanet={selectedPlanet}
+          onClose={() => setSelectedPlanet(null)}
+        />
+      )}
 
     </main>
   );
