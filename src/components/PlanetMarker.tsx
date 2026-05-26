@@ -69,8 +69,16 @@ export function PlanetMarker({
         e.stopPropagation();
         onClick();
       }}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={() => {
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          onMouseEnter?.();
+        }
+      }}
+      onMouseLeave={() => {
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          onMouseLeave?.();
+        }
+      }}
       id={`marker-g-${planetKey}`}
     >
       {/* Planet Astrological Glyph Symbol */}
@@ -84,10 +92,9 @@ export function PlanetMarker({
         x="0"
         y="10"
         textAnchor="middle"
-        fontSize="32"
         fontWeight="bold"
         fill={isHighlighted ? '#ec4899' : style.color}
-        className="select-none transition-colors duration-300"
+        className="text-[48px] md:text-[32px] select-none transition-colors duration-300"
         style={{
           fontFamily: 'sans-serif',
           filter: isHighlighted

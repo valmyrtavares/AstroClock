@@ -6,6 +6,7 @@ import { PlanetsData } from '../hooks/usePlanetPositions';
 import { PlanetMarker, PLANET_STYLE_MAPPING } from './PlanetMarker';
 import { AspectLines } from './AspectLines';
 import { PLANETS_INFO } from '../data/planetsInfo';
+import { SIGNS_INFO } from '../data/signsInfo';
 
 interface ZodiacWheelProps {
   planets: PlanetsData | null;
@@ -51,6 +52,7 @@ export const ORBIT_MAPPING: Record<string, number> = {
 
 export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacWheelProps) {
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
+  const [hoveredSign, setHoveredSign] = useState<string | null>(null);
 
   // Helper to draw SVG pie-slice paths
   const getSectorPath = (startAngle: number, endAngle: number, innerR: number, outerR: number) => {
@@ -175,7 +177,12 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               : 0;
 
             return (
-              <g key={`segment-${idx}`} className="group cursor-pointer">
+              <g
+                key={`segment-${idx}`}
+                className="group cursor-pointer"
+                onMouseEnter={() => setHoveredSign(sign.name)}
+                onMouseLeave={() => setHoveredSign(null)}
+              >
                 {/* Sector Path */}
                 <path
                   d={d}
@@ -194,25 +201,15 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
                   />
                 )}
 
-                {/* Outer Sign Symbol and Name */}
+                {/* Outer Sign Symbol */}
                 <text
                   x={lx}
                   y={ly + 12}
                   textAnchor="middle"
-                  className="fill-purple-300 font-medium transition-transform duration-300 group-hover:scale-125 group-hover:fill-cosmic-pink"
+                  className="fill-purple-300 font-medium transition-colors duration-300 group-hover:fill-cosmic-pink"
                   style={{ fontSize: '32px' }}
                 >
                   {sign.symbol}
-                </text>
-                
-                {/* Inner Sign Name tooltip helper on hover (small text) */}
-                <text
-                  x={lx}
-                  y={ly + 32}
-                  textAnchor="middle"
-                  className="fill-purple-400/0 text-[9px] tracking-wider uppercase pointer-events-none transition-all duration-300 group-hover:fill-purple-300"
-                >
-                  {sign.name.slice(0, 3)}
                 </text>
               </g>
             );
@@ -281,7 +278,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -331,6 +328,50 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
 
             <p className="text-sm text-purple-100 leading-relaxed text-justify">
               {PLANETS_INFO[hoveredPlanet].description}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sign Hover Tooltip Overlay */}
+      <AnimatePresence>
+        {hoveredSign && SIGNS_INFO[hoveredSign] && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner bg-purple-500/20 text-purple-300 border border-purple-500/50"
+              >
+                {ZODIAC_SIGNS.find(s => s.name === hoveredSign)?.symbol}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-wide">
+                  {SIGNS_INFO[hoveredSign].name}
+                </h3>
+                <p className="text-xs text-purple-300 font-medium tracking-wider uppercase">
+                  Regente: <span className="text-white">{SIGNS_INFO[hoveredSign].ruler}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-4 text-xs font-mono text-purple-200/80 bg-black/20 p-3 rounded-lg border border-white/5 flex justify-between">
+              <div>
+                <span className="block text-purple-400/70 mb-1">Elemento</span>
+                <span className="text-white font-medium">{SIGNS_INFO[hoveredSign].element}</span>
+              </div>
+              <div className="text-right">
+                <span className="block text-purple-400/70 mb-1">Qualidade</span>
+                <span className="text-white font-medium">{SIGNS_INFO[hoveredSign].quality}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-purple-100 leading-relaxed text-justify">
+              {SIGNS_INFO[hoveredSign].description}
             </p>
           </motion.div>
         )}

@@ -25,7 +25,7 @@ export default function Home() {
   } = usePlanetPositions();
 
   return (
-    <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 flex flex-col justify-between space-y-6 min-h-screen">
+    <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-between space-y-4 md:space-y-6 min-h-screen overflow-x-hidden">
       
       {/* 1. Header Navigation Glassmorphic Panel */}
       <header className="glass-panel rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
