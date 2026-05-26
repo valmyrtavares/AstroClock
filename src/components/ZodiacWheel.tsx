@@ -181,8 +181,6 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               <g
                 key={`segment-${idx}`}
                 className="group cursor-pointer"
-                onMouseEnter={() => setHoveredSign(sign.name)}
-                onMouseLeave={() => setHoveredSign(null)}
                 onClick={() => setHoveredSign(hoveredSign === sign.name ? null : sign.name)}
               >
                 {/* Sector Path */}
@@ -280,7 +278,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] max-h-[85vh] overflow-y-auto custom-scrollbar glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-[100] pointer-events-none"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -343,30 +341,32 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-auto"
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] max-h-[85vh] overflow-y-auto custom-scrollbar glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-[100] pointer-events-auto"
           >
-            <button
-              onClick={() => setHoveredSign(null)}
-              className="absolute top-4 right-4 md:hidden w-8 h-8 rounded-lg flex items-center justify-center bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-100 transition-all duration-200 border border-purple-500/10 hover:border-purple-500/30"
-              aria-label="Fechar"
-            >
-              <X size={16} />
-            </button>
-
-            <div className="flex items-center gap-3 mb-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner bg-purple-500/20 text-purple-300 border border-purple-500/50"
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner bg-purple-500/20 text-purple-300 border border-purple-500/50"
+                >
+                  {ZODIAC_SIGNS.find(s => s.name === hoveredSign)?.symbol}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white tracking-wide">
+                    {SIGNS_INFO[hoveredSign].name}
+                  </h3>
+                  <p className="text-xs text-purple-300 font-medium tracking-wider uppercase">
+                    Regente: <span className="text-white">{SIGNS_INFO[hoveredSign].ruler}</span>
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => setHoveredSign(null)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-100 transition-all duration-200 border border-purple-500/10 hover:border-purple-500/30 shrink-0"
+                aria-label="Fechar"
               >
-                {ZODIAC_SIGNS.find(s => s.name === hoveredSign)?.symbol}
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white tracking-wide">
-                  {SIGNS_INFO[hoveredSign].name}
-                </h3>
-                <p className="text-xs text-purple-300 font-medium tracking-wider uppercase">
-                  Regente: <span className="text-white">{SIGNS_INFO[hoveredSign].ruler}</span>
-                </p>
-              </div>
+                <X size={16} />
+              </button>
             </div>
 
             <div className="space-y-2 mb-4 text-xs font-mono text-purple-200/80 bg-black/20 p-3 rounded-lg border border-white/5 flex justify-between">
