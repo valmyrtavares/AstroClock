@@ -267,7 +267,7 @@ export function AspectModal({ planets, selectedPlanet, onClose }: AspectModalPro
                             className="overflow-hidden"
                           >
                             <div className="px-4 pb-4 pt-1 border-t border-white/5">
-                              <p className="text-xs text-purple-200 leading-relaxed text-justify bg-black/20 p-3 rounded-xl">
+                              <p className="text-xs text-purple-200 leading-relaxed text-left bg-black/20 p-3 rounded-xl">
                                 {getAspectInterpretation(translatedPlanetName, p2Name, aspect.label)}
                               </p>
                             </div>
@@ -287,7 +287,7 @@ export function AspectModal({ planets, selectedPlanet, onClose }: AspectModalPro
                 {translatedPlanetName} em {translatedZodiacSign}
               </span>
               <div className="glass-panel rounded-2xl p-4 border border-pink-500/10 bg-gradient-to-br from-purple-900/10 to-pink-900/5">
-                <p className="text-sm text-purple-100 leading-relaxed text-justify">
+                <p className="text-sm text-purple-100 leading-relaxed text-left">
                   {getPlanetInSignInterpretation(translatedPlanetName, translatedZodiacSign)}
                 </p>
               </div>

@@ -326,7 +326,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               </div>
             </div>
 
-            <p className="text-sm text-purple-100 leading-relaxed text-justify">
+            <p className="text-sm text-purple-100 leading-relaxed text-left">
               {PLANETS_INFO[hoveredPlanet].description}
             </p>
           </motion.div>
@@ -370,7 +370,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               </div>
             </div>
 
-            <p className="text-sm text-purple-100 leading-relaxed text-justify">
+            <p className="text-sm text-purple-100 leading-relaxed text-left">
               {SIGNS_INFO[hoveredSign].description}
             </p>
           </motion.div>
