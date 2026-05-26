@@ -176,7 +176,7 @@ export function KnowledgeDrawer({ isOpen, onClose }: KnowledgeDrawerProps) {
 
       {/* Drawer panel */}
       <aside
-        className={`relative w-full max-w-md h-full flex flex-col ${isClosing ? 'drawer-exit' : 'drawer-enter'}`}
+        className={`relative w-[85vw] sm:w-[400px] h-full flex flex-col ${isClosing ? 'drawer-exit' : 'drawer-enter'}`}
         style={{
           background: 'rgba(8, 4, 18, 0.92)',
           backdropFilter: 'blur(24px) saturate(140%)',

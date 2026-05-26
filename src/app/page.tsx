@@ -105,7 +105,7 @@ export default function Home() {
       {/* 2. Main Content Grid (Central Wheel vs Sidebar) */}
       <div className="grid grid-cols-12 gap-6 items-start flex-1 w-full">
         {/* Left Column: Central Zodiac Wheel Visualizer (8/12 on large, 12/12 on mobile) */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col items-center justify-center glass-panel rounded-3xl p-4 md:p-6 shadow-xl relative overflow-hidden h-full min-h-[500px] lg:min-h-[620px] aspect-square lg:aspect-auto">
+        <div className="col-span-12 lg:col-span-8 flex flex-col items-center justify-center glass-panel rounded-3xl p-4 md:p-6 shadow-xl relative overflow-hidden w-full aspect-square lg:h-full lg:aspect-auto lg:min-h-[620px]">
           {/* Subtle starry circular highlights in background */}
           <div className="absolute inset-0 pointer-events-none opacity-30 flex items-center justify-center">
             <div className="w-[450px] h-[450px] rounded-full border border-purple-500/5 animate-breath" />
