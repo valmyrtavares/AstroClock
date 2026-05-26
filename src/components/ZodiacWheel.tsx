@@ -278,7 +278,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -326,7 +326,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               </div>
             </div>
 
-            <p className="text-sm text-purple-100 leading-relaxed text-left">
+            <p className="text-sm text-purple-100 leading-relaxed text-left whitespace-pre-wrap">
               {PLANETS_INFO[hoveredPlanet].description}
             </p>
           </motion.div>
@@ -341,7 +341,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[calc(100vw-32px)] max-w-[480px] glass-panel bg-[#05020a]/80 backdrop-blur-lg p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
           >
             <div className="flex items-center gap-3 mb-3">
               <div
@@ -370,7 +370,7 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
               </div>
             </div>
 
-            <p className="text-sm text-purple-100 leading-relaxed text-left">
+            <p className="text-sm text-purple-100 leading-relaxed text-left whitespace-pre-wrap">
               {SIGNS_INFO[hoveredSign].description}
             </p>
           </motion.div>
