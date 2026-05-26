@@ -12,6 +12,8 @@ interface PlanetMarkerProps {
   centerY: number;
   isHighlighted: boolean;
   onClick: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const PLANET_STYLE_MAPPING: Record<
@@ -37,7 +39,9 @@ export function PlanetMarker({
   centerX,
   centerY,
   isHighlighted,
-  onClick
+  onClick,
+  onMouseEnter,
+  onMouseLeave
 }: PlanetMarkerProps) {
   const style = PLANET_STYLE_MAPPING[planetKey] || {
     symbol: '?',
@@ -65,6 +69,8 @@ export function PlanetMarker({
         e.stopPropagation();
         onClick();
       }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       id={`marker-g-${planetKey}`}
     >
       {/* Planet Astrological Glyph Symbol */}
@@ -109,18 +115,6 @@ export function PlanetMarker({
           </text>
         </g>
       )}
-
-      {/* Name plate visible briefly on group hover (fade-in) */}
-      <text
-        x="0"
-        y="-26"
-        textAnchor="middle"
-        fontSize="10"
-        fill="#a78bfa"
-        className="opacity-0 hover:opacity-100 font-sans tracking-wide uppercase transition-opacity duration-300 pointer-events-none"
-      >
-        {data.name}
-      </text>
     </motion.g>
   );
 }

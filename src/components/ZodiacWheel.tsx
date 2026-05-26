@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { PlanetsData } from '../hooks/usePlanetPositions';
-import { PlanetMarker } from './PlanetMarker';
+import { PlanetMarker, PLANET_STYLE_MAPPING } from './PlanetMarker';
 import { AspectLines } from './AspectLines';
+import { PLANETS_INFO } from '../data/planetsInfo';
 
 interface ZodiacWheelProps {
   planets: PlanetsData | null;
@@ -48,6 +50,8 @@ export const ORBIT_MAPPING: Record<string, number> = {
 };
 
 export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacWheelProps) {
+  const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
+
   // Helper to draw SVG pie-slice paths
   const getSectorPath = (startAngle: number, endAngle: number, innerR: number, outerR: number) => {
     const startRad = (startAngle * Math.PI) / 180;
@@ -262,10 +266,75 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
                 centerY={CENTER}
                 isHighlighted={selectedPlanet === key}
                 onClick={() => onSelectPlanet(selectedPlanet === key ? null : key)}
+                onMouseEnter={() => setHoveredPlanet(key)}
+                onMouseLeave={() => setHoveredPlanet(null)}
               />
             ))}
         </g>
       </svg>
+
+      {/* Hover Tooltip Overlay */}
+      <AnimatePresence>
+        {hoveredPlanet && PLANETS_INFO[hoveredPlanet] && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:top-4 md:right-4 md:left-auto md:translate-x-0 w-[340px] glass-panel p-5 rounded-2xl border border-purple-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)] z-50 pointer-events-none"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-inner"
+                style={{
+                  backgroundColor: `${PLANET_STYLE_MAPPING[hoveredPlanet]?.color}20`,
+                  color: PLANET_STYLE_MAPPING[hoveredPlanet]?.color,
+                  border: `1px solid ${PLANET_STYLE_MAPPING[hoveredPlanet]?.color}50`
+                }}
+              >
+                {PLANET_STYLE_MAPPING[hoveredPlanet]?.symbol}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white tracking-wide">
+                  {PLANETS_INFO[hoveredPlanet].name}
+                </h3>
+                <p className="text-xs text-purple-300 font-medium tracking-wider uppercase">
+                  Regente: <span className="text-white">{PLANETS_INFO[hoveredPlanet].ruler}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-4 text-xs font-mono text-purple-200/80 bg-black/20 p-3 rounded-lg border border-white/5">
+              {PLANETS_INFO[hoveredPlanet].diameter && (
+                <div className="flex justify-between">
+                  <span>Diâmetro:</span>
+                  <span className="text-white">{PLANETS_INFO[hoveredPlanet].diameter}</span>
+                </div>
+              )}
+              {PLANETS_INFO[hoveredPlanet].orbitFromSun && (
+                <div className="flex justify-between">
+                  <span>Órbita (Sol):</span>
+                  <span className="text-white">{PLANETS_INFO[hoveredPlanet].orbitFromSun}</span>
+                </div>
+              )}
+              {PLANETS_INFO[hoveredPlanet].orbitFromEarth && (
+                <div className="flex justify-between">
+                  <span>Órbita (Terra):</span>
+                  <span className="text-white">{PLANETS_INFO[hoveredPlanet].orbitFromEarth}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>Período:</span>
+                <span className="text-white">{PLANETS_INFO[hoveredPlanet].period}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-purple-100 leading-relaxed text-justify">
+              {PLANETS_INFO[hoveredPlanet].description}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
