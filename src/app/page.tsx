@@ -6,10 +6,14 @@ import { ZodiacWheel } from '../components/ZodiacWheel';
 import { PlanetSidebar } from '../components/PlanetSidebar';
 import { TimeControls } from '../components/TimeControls';
 import { AspectModal } from '../components/AspectModal';
-import { Compass, Sparkles, HelpCircle } from 'lucide-react';
+import { KnowledgeDrawer } from '../components/KnowledgeDrawer';
+import { AuthorCard } from '../components/AuthorCard';
+import { Compass, Sparkles, Menu } from 'lucide-react';
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false);
+  const [knowledgeOpen, setKnowledgeOpen] = React.useState(false);
+  const [authorCardOpen, setAuthorCardOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
@@ -50,8 +54,18 @@ export default function Home() {
       
       {/* 1. Header Navigation Glassmorphic Panel */}
       <header className="glass-panel rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Title Brand */}
-        <div className="flex items-center space-x-3.5">
+        {/* Left side: Knowledge button + Title Brand */}
+        <div className="flex items-center space-x-3">
+          {/* Knowledge Drawer toggle */}
+          <button
+            onClick={() => setKnowledgeOpen(true)}
+            className="w-12 h-12 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/15 hover:border-purple-500/30 flex items-center justify-center transition-all duration-300 group cursor-pointer"
+            aria-label="Guia Astrológico"
+            title="Guia Astrológico"
+          >
+            <Menu size={22} className="text-purple-400 group-hover:text-purple-200 transition-colors" />
+          </button>
+
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/20 glow-border-purple">
             <Compass className="text-white w-5 h-5 animate-spin" style={{ animationDuration: '60s' }} />
           </div>
@@ -66,7 +80,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Dynamic Status Badges */}
+        {/* Right side: Error or Author Branding */}
         <div className="flex items-center space-x-3">
           {error ? (
             <button 
@@ -76,15 +90,14 @@ export default function Home() {
               Erro ao Carregar: Tentar Novamente
             </button>
           ) : (
-            <div className="hidden sm:flex items-center space-x-2.5">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
+            <button
+              onClick={() => setAuthorCardOpen(true)}
+              className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/10 hover:border-amber-500/20 transition-all duration-300 cursor-pointer group"
+            >
+              <span className="text-[10px] font-semibold tracking-wider uppercase gold-shimmer-text text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 group-hover:from-amber-200 group-hover:via-yellow-100 group-hover:to-amber-200 transition-all">
+                ✦ Desenvolvido por VALMYR TAVARES
               </span>
-              <span className="text-[10px] text-purple-300 font-semibold tracking-wider uppercase font-mono">
-                Astronomical precision (VSOP87)
-              </span>
-            </div>
+            </button>
           )}
         </div>
       </header>
@@ -137,6 +150,18 @@ export default function Home() {
           onClose={() => setSelectedPlanet(null)}
         />
       )}
+
+      {/* 5. Knowledge Drawer */}
+      <KnowledgeDrawer
+        isOpen={knowledgeOpen}
+        onClose={() => setKnowledgeOpen(false)}
+      />
+
+      {/* 6. Author Card */}
+      <AuthorCard
+        isOpen={authorCardOpen}
+        onClose={() => setAuthorCardOpen(false)}
+      />
 
     </main>
   );

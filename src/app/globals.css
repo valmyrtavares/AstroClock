@@ -158,3 +158,60 @@ body {
 .animate-breath {
   animation: breathing-pulse 4s ease-in-out infinite;
 }
+
+/* Drawer slide-in from left */
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scale-up {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.drawer-enter {
+  animation: slide-in-left 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.drawer-exit {
+  animation: slide-out-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.overlay-enter {
+  animation: fade-in 0.3s ease forwards;
+}
+
+.overlay-exit {
+  animation: fade-out 0.25s ease forwards;
+}
+
+.card-enter {
+  animation: scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Gold shimmer for author link */
+@keyframes gold-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gold-shimmer-text {
+  background-size: 200% auto;
+  animation: gold-shimmer 4s ease-in-out infinite;
+}
