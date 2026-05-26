@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, AlertCircle } from 'lucide-react';
+import { X, Sparkles, AlertCircle, ChevronDown } from 'lucide-react';
 import { PlanetsData } from '../hooks/usePlanetPositions';
 import { PLANET_STYLE_MAPPING } from './PlanetMarker';
 import { formatAstrologicalPosition } from './PlanetSidebar';
+import { getAspectInterpretation, getPlanetInSignInterpretation } from '../data/interpretations';
 
 interface AspectModalProps {
   planets: PlanetsData | null;
@@ -50,6 +51,8 @@ const ASPECTS_CONFIG = [
 ];
 
 export function AspectModal({ planets, selectedPlanet, onClose }: AspectModalProps) {
+  const [expandedAspect, setExpandedAspect] = useState<number | null>(null);
+
   // Calculate aspects for the selected planet
   const selectedAspects = React.useMemo(() => {
     if (!planets || !selectedPlanet) return [];
@@ -197,62 +200,98 @@ export function AspectModal({ planets, selectedPlanet, onClose }: AspectModalPro
                   const p2Name = PLANET_TRANSLATIONS[aspect.p2] || aspect.p2Data.name;
                   const p2Zodiac = ZODIAC_TRANSLATIONS[aspect.p2Data.sign] || aspect.p2Data.sign;
 
+                  const isExpanded = expandedAspect === idx;
                   return (
                     <motion.div
                       key={`aspect-card-${idx}`}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="glass-panel rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border border-purple-500/5 hover:border-purple-500/15 transition-all duration-300 relative overflow-hidden group"
+                      className="glass-panel rounded-2xl border border-purple-500/5 hover:border-purple-500/20 transition-all duration-300 relative overflow-hidden group cursor-pointer"
+                      onClick={() => setExpandedAspect(isExpanded ? null : idx)}
                     >
-                      {/* Left: Origin Planet Info */}
-                      <div className="flex items-center space-x-2.5 min-w-[120px]">
-                        <span className="text-xl text-purple-100" style={{ color: currentPlanetStyle.color }}>
-                          {currentPlanetStyle.symbol}
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-purple-200">{translatedPlanetName}</span>
-                          <span className="text-[10px] text-purple-400 font-mono">
-                            {formatAstrologicalPosition(aspect.p1Data.longitude, aspect.p1Data.symbol).split(' ')[0]} {aspect.p1Data.symbol}
+                      <div className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        {/* Left: Origin Planet Info */}
+                        <div className="flex items-center space-x-2.5 min-w-[120px]">
+                          <span className="text-xl text-purple-100" style={{ color: currentPlanetStyle.color }}>
+                            {currentPlanetStyle.symbol}
+                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-purple-200">{translatedPlanetName}</span>
+                            <span className="text-[10px] text-purple-400 font-mono">
+                              {formatAstrologicalPosition(aspect.p1Data.longitude, aspect.p1Data.symbol).split(' ')[0]} {aspect.p1Data.symbol}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Middle: Aspect Connector Badge */}
+                        <div className="flex-1 flex flex-col items-center justify-center text-center relative">
+                          <div 
+                            className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border transition-all duration-300 flex items-center gap-1.5"
+                            style={{ 
+                              color: aspect.color, 
+                              borderColor: `${aspect.color}35`,
+                              backgroundColor: `${aspect.color}12`,
+                              boxShadow: `0 0 10px ${aspect.color}10`
+                            }}
+                          >
+                            {aspect.label}
+                            <ChevronDown size={12} className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                          </div>
+                          <span className="text-[9px] text-purple-400/80 font-mono mt-1">
+                            Separamento: {aspect.angleDiff.toFixed(1)}° (Orb: {aspect.orbUsed.toFixed(1)}°)
+                          </span>
+                        </div>
+
+                        {/* Right: Target Planet Info */}
+                        <div className="flex items-center justify-end space-x-2.5 min-w-[120px] text-right">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-purple-200">{p2Name}</span>
+                            <span className="text-[10px] text-purple-400 font-mono">
+                              {formatAstrologicalPosition(aspect.p2Data.longitude, aspect.p2Data.symbol).split(' ')[0]} {aspect.p2Data.symbol}
+                            </span>
+                          </div>
+                          <span className="text-xl" style={{ color: p2Style.color }}>
+                            {p2Style.symbol}
                           </span>
                         </div>
                       </div>
 
-                      {/* Middle: Aspect Connector Badge */}
-                      <div className="flex-1 flex flex-col items-center justify-center text-center">
-                        <div 
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border transition-all duration-300"
-                          style={{ 
-                            color: aspect.color, 
-                            borderColor: `${aspect.color}35`,
-                            backgroundColor: `${aspect.color}12`,
-                            boxShadow: `0 0 10px ${aspect.color}10`
-                          }}
-                        >
-                          {aspect.label}
-                        </div>
-                        <span className="text-[9px] text-purple-400/80 font-mono mt-1">
-                          Separamento: {aspect.angleDiff.toFixed(1)}° (Orb: {aspect.orbUsed.toFixed(1)}°)
-                        </span>
-                      </div>
-
-                      {/* Right: Target Planet Info */}
-                      <div className="flex items-center justify-end space-x-2.5 min-w-[120px] text-right">
-                        <div className="flex flex-col">
-                          <span className="text-xs font-semibold text-purple-200">{p2Name}</span>
-                          <span className="text-[10px] text-purple-400 font-mono">
-                            {formatAstrologicalPosition(aspect.p2Data.longitude, aspect.p2Data.symbol).split(' ')[0]} {aspect.p2Data.symbol}
-                          </span>
-                        </div>
-                        <span className="text-xl" style={{ color: p2Style.color }}>
-                          {p2Style.symbol}
-                        </span>
-                      </div>
+                      {/* Expanded Interpretation Content */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="px-4 pb-4 pt-1 border-t border-white/5">
+                              <p className="text-xs text-purple-200 leading-relaxed text-justify bg-black/20 p-3 rounded-xl">
+                                {getAspectInterpretation(translatedPlanetName, p2Name, aspect.label)}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </motion.div>
                   );
                 })}
               </div>
             )}
+
+            {/* Planet in Sign Interpretation Block */}
+            <div className="mt-6 pt-6 border-t border-purple-500/10">
+              <span className="text-[10px] text-pink-400 uppercase tracking-widest font-semibold block mb-3 flex items-center gap-1.5">
+                <Sparkles size={12} />
+                {translatedPlanetName} em {translatedZodiacSign}
+              </span>
+              <div className="glass-panel rounded-2xl p-4 border border-pink-500/10 bg-gradient-to-br from-purple-900/10 to-pink-900/5">
+                <p className="text-sm text-purple-100 leading-relaxed text-justify">
+                  {getPlanetInSignInterpretation(translatedPlanetName, translatedZodiacSign)}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Footer Panel */}
