@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Star, Mail, MessageCircle, ExternalLink } from 'lucide-react';
+import { X, Star, Mail, MessageCircle, ExternalLink, Check } from 'lucide-react';
 
 interface AuthorCardProps {
   isOpen: boolean;
@@ -10,7 +10,22 @@ interface AuthorCardProps {
 
 export function AuthorCard({ isOpen, onClose }: AuthorCardProps) {
   const [isClosing, setIsClosing] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
   const cardRef = React.useRef<HTMLDivElement>(null);
+
+  const handleEmailClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const email = "valmyrtavares@gmail.com";
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Erro ao copiar o email", err);
+    }
+    // Tenta abrir o cliente de email também
+    window.location.href = `mailto:${email}`;
+  };
 
   const handleClose = React.useCallback(() => {
     setIsClosing(true);
@@ -119,11 +134,22 @@ export function AuthorCard({ isOpen, onClose }: AuthorCardProps) {
           <div className="flex items-center gap-2 mb-4">
             <a
               href="mailto:valmyrtavares@gmail.com"
-              className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/20 transition-all duration-200 group"
+              onClick={handleEmailClick}
+              className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 group ${
+                copied 
+                  ? 'bg-emerald-500/10 border-emerald-500/20' 
+                  : 'bg-purple-500/5 hover:bg-purple-500/10 border-purple-500/10 hover:border-purple-500/20 border'
+              }`}
             >
-              <Mail size={14} className="text-purple-400 group-hover:text-purple-300" />
-              <span className="text-[11px] text-purple-300 group-hover:text-purple-200 transition-colors font-medium">
-                Email
+              {copied ? (
+                <Check size={14} className="text-emerald-400" />
+              ) : (
+                <Mail size={14} className="text-purple-400 group-hover:text-purple-300" />
+              )}
+              <span className={`text-[11px] font-medium transition-colors ${
+                copied ? 'text-emerald-300' : 'text-purple-300 group-hover:text-purple-200'
+              }`}>
+                {copied ? 'Copiado!' : 'Email'}
               </span>
             </a>
 
