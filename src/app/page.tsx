@@ -140,6 +140,18 @@ export default function Home() {
           simulationSpeed={simulationSpeed}
           setSimulationSpeed={setSimulationSpeed}
         />
+        
+        {/* Mobile-only Developer contact button */}
+        <div className="mt-4 flex sm:hidden justify-center mb-4">
+            <button
+              onClick={() => setAuthorCardOpen(true)}
+              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 hover:border-amber-500/30 transition-all duration-300 group"
+            >
+              <span className="text-[11px] font-semibold tracking-wider uppercase gold-shimmer-text text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300">
+                ✦ Desenvolvido por VALMYR TAVARES - Orçamentos ✦
+              </span>
+            </button>
+        </div>
       </footer>
 
       {/* 4. Aspect Modal Window overlay */}

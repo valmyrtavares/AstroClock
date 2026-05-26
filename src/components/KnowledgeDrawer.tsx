@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, BookOpen, ChevronDown, Compass, Zap, RotateCcw, Globe2, Sparkles, MapPin } from 'lucide-react';
+import { X, BookOpen, ChevronDown, Compass, Zap, RotateCcw, Globe2, Sparkles, MapPin, Star, MessageCircle, ExternalLink } from 'lucide-react';
 
 interface KnowledgeDrawerProps {
   isOpen: boolean;
@@ -255,6 +255,44 @@ export function KnowledgeDrawer({ isOpen, onClose }: KnowledgeDrawerProps) {
               </div>
             );
           })}
+        </div>
+
+        {/* Developer Contact Info */}
+        <div className="px-4 pb-4">
+          <div className="p-4 rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-purple-500/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+            
+            <h4 className="text-[13px] font-bold text-amber-300 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
+              <Star size={14} className="text-amber-400" />
+              Desenvolvedor & Contato
+            </h4>
+            
+            <p className="text-[11.5px] text-amber-100/80 leading-[1.6] mb-3">
+              Desenvolvido por <strong>Valmyr Tavares</strong>. Precisando de um app, site ou sistema? Entre em contato e vamos conversar!
+            </p>
+            
+            <div className="flex flex-col gap-2">
+              <a
+                href="https://wa.me/5511970741310?text=Olá! Gostaria de falar sobre um projeto de desenvolvimento."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 hover:border-amber-400/50 text-amber-200 shadow-lg shadow-amber-500/10"
+              >
+                <MessageCircle size={14} />
+                <span>Falar no WhatsApp</span>
+              </a>
+              
+              <a
+                href="https://valmyrtavares.github.io/cv-portifolio/#/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 hover:border-purple-400/40 text-purple-200"
+              >
+                <ExternalLink size={13} />
+                <span>Acessar Meu Portfólio</span>
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
