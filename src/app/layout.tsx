@@ -28,6 +28,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${outfit.variable} ${inter.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
       <body className="font-sans antialiased text-[#f3eff9] bg-[#04020a] min-h-screen relative">
         {/* Ambient cosmic backgrounds */}

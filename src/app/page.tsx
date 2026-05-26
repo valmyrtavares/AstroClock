@@ -9,6 +9,12 @@ import { AspectModal } from '../components/AspectModal';
 import { Compass, Sparkles, HelpCircle } from 'lucide-react';
 
 export default function Home() {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const {
     planets,
     loading,
@@ -23,6 +29,21 @@ export default function Home() {
     setSimulationSpeed,
     refetch
   } = usePlanetPositions();
+
+  if (!mounted) {
+    return (
+      <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-600 to-indigo-500 flex items-center justify-center animate-spin" style={{ animationDuration: '3s' }}>
+            <Compass className="text-white w-6 h-6" />
+          </div>
+          <p className="text-sm text-purple-300 font-medium tracking-widest uppercase animate-pulse">
+            Carregando AstroClock...
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-between space-y-4 md:space-y-6 min-h-screen overflow-x-hidden">
