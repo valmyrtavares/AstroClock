@@ -287,7 +287,7 @@ export function AspectModal({ planets, selectedPlanet, onClose }: AspectModalPro
                 {translatedPlanetName} em {translatedZodiacSign}
               </span>
               <div className="glass-panel rounded-2xl p-4 border border-pink-500/10 bg-gradient-to-br from-purple-900/10 to-pink-900/5">
-                <p className="text-sm text-purple-100 leading-relaxed text-left">
+                <p className="text-sm text-purple-100 leading-relaxed text-left whitespace-pre-wrap">
                   {getPlanetInSignInterpretation(translatedPlanetName, translatedZodiacSign)}
                 </p>
               </div>
