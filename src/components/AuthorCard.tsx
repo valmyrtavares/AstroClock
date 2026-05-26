@@ -107,7 +107,8 @@ export function AuthorCard({ isOpen, onClose }: AuthorCardProps) {
           </div>
 
           {/* Bio */}
-          <div className="mb-5 p-3.5 rounded-xl bg-purple-500/5 border border-purple-500/10">
+          {/* Bio */}
+          <div className="mb-4 p-3.5 rounded-xl bg-purple-500/5 border border-purple-500/10">
             <p className="text-[12.5px] text-purple-300/90 leading-[1.7]">
               Idealizador e desenvolvedor do AstroClock. Unindo tecnologia de ponta e tradição astrológica para oferecer 
               ferramentas de precisão astronômica acessíveis a todos os interessados na linguagem dos astros.
@@ -115,43 +116,65 @@ export function AuthorCard({ isOpen, onClose }: AuthorCardProps) {
           </div>
 
           {/* Contact links */}
-          <div className="space-y-2">
+          <div className="flex items-center gap-2 mb-4">
             <a
-              href="mailto:contato@valmyrtavares.com"
-              className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/20 transition-all duration-200 group"
+              href="mailto:valmyrtavares@gmail.com"
+              className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/20 transition-all duration-200 group"
             >
-              <Mail size={15} className="text-purple-400 group-hover:text-purple-300" />
-              <span className="text-xs text-purple-300 group-hover:text-purple-200 transition-colors font-medium">
-                contato@valmyrtavares.com
+              <Mail size={14} className="text-purple-400 group-hover:text-purple-300" />
+              <span className="text-[11px] text-purple-300 group-hover:text-purple-200 transition-colors font-medium">
+                Email
               </span>
             </a>
 
             <a
-              href="https://wa.me/5500000000000"
+              href="https://wa.me/5511970741310"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-purple-500/5 hover:bg-emerald-500/10 border border-purple-500/10 hover:border-emerald-500/20 transition-all duration-200 group"
+              className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-xl bg-purple-500/5 hover:bg-emerald-500/10 border border-purple-500/10 hover:border-emerald-500/20 transition-all duration-200 group"
             >
-              <MessageCircle size={15} className="text-emerald-400 group-hover:text-emerald-300" />
-              <span className="text-xs text-purple-300 group-hover:text-emerald-200 transition-colors font-medium">
+              <MessageCircle size={14} className="text-emerald-400 group-hover:text-emerald-300" />
+              <span className="text-[11px] text-purple-300 group-hover:text-emerald-200 transition-colors font-medium">
                 WhatsApp
               </span>
             </a>
+          </div>
 
-            <a
-              href="#"
-              className="flex items-center justify-center space-x-2 mt-3 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide uppercase transition-all duration-300 group"
-              style={{
-                background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(139, 92, 246, 0.15))',
-                border: '1px solid rgba(251, 191, 36, 0.2)',
-              }}
-            >
-              <Star size={13} className="text-amber-400 group-hover:text-amber-300" />
-              <span className="text-amber-200 group-hover:text-amber-100 transition-colors">
-                Consultas & Serviços
-              </span>
-              <ExternalLink size={11} className="text-amber-400/60" />
-            </a>
+          {/* Software Development Services */}
+          <div className="p-4 rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-purple-500/5 relative overflow-hidden">
+            {/* Background glow */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+            
+            <h4 className="text-[13px] font-bold text-amber-300 mb-2 flex items-center gap-1.5 uppercase tracking-wide">
+              <Star size={14} className="text-amber-400" />
+              Serviços e Orçamentos
+            </h4>
+            
+            <p className="text-[11.5px] text-amber-100/80 leading-[1.6] mb-4">
+              Desenvolvemos sites, aplicativos, landing pages, controle de estoque, ERPs, e todo tipo de solução que você precisa e não sabe para quem pedir. Entre em contato e vamos conversar!
+            </p>
+            
+            <div className="flex flex-col gap-2">
+              <a
+                href="https://wa.me/5511970741310?text=Olá! Gostaria de falar sobre um projeto de desenvolvimento."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 hover:border-amber-400/50 text-amber-200 shadow-lg shadow-amber-500/10"
+              >
+                <MessageCircle size={14} />
+                <span>Solicitar Orçamento</span>
+              </a>
+              
+              <a
+                href="https://valmyrtavares.github.io/cv-portifolio/#/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 hover:border-purple-400/40 text-purple-200"
+              >
+                <ExternalLink size={13} />
+                <span>Acessar Meu Portfólio</span>
+              </a>
+            </div>
           </div>
         </div>
 

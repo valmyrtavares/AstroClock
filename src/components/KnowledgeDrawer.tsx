@@ -20,13 +20,17 @@ const TOPICS: TopicSection[] = [
     id: 'como-funciona',
     icon: <Compass size={16} className="text-purple-400" />,
     title: 'Como funciona o AstroClock',
-    content: `O AstroClock é um visualizador astrológico em tempo real que mostra as posições geocêntricas dos planetas no zodíaco. Utilizando o algoritmo VSOP87 (Variations Séculaires des Orbites Planétaires), calculamos com precisão astronômica onde cada planeta se encontra a cada instante.
+    content: `O AstroClock é um portal astrológico interativo em tempo real. Utilizando precisão astronômica (algoritmo VSOP87), ele calcula e projeta exatamente onde cada planeta se encontra no zodíaco a cada instante.
 
-A roda zodiacal central exibe os 12 signos e os planetas posicionados em suas longitudes eclípticas reais. As linhas coloridas entre os planetas representam os aspectos astrológicos — relações angulares significativas que astrólogos interpretam como influências energéticas.
+A roda zodiacal central é o coração da ferramenta. Nela você pode explorar o cosmos de forma intuitiva:
 
-Ao clicar em qualquer planeta, você verá seus aspectos ativos naquele momento, com interpretações detalhadas. Os controles de tempo na parte inferior permitem avançar ou retroceder no tempo para explorar configurações celestes passadas ou futuras.
+• Explore os Signos: Ao passar o mouse sobre qualquer um dos 12 signos na roda, você verá um resumo instantâneo de suas características e energias principais.
 
-Esta ferramenta oferece, em tempo real, informações que normalmente exigiriam consulta a efemérides ou softwares especializados — tudo gratuitamente e de forma visual.`
+• Explore os Planetas: Ao clicar em um planeta (na roda ou na lista lateral), um painel detalhado se abrirá. Nele você encontrará uma leitura completa mostrando todos os aspectos que aquele planeta está formando naquele momento exato, além de uma interpretação profunda do que a presença daquele astro significa no signo específico em que se encontra.
+
+As linhas coloridas que cruzam o centro representam os aspectos astrológicos — conexões e diálogos energéticos entre os astros. Além disso, os controles na parte inferior permitem avançar ou retroceder no tempo para explorar o céu do passado ou do futuro.
+
+O AstroClock traduz a complexidade das efemérides astronômicas em uma experiência visual rica, acessível e gratuita.`
   },
   {
     id: 'aspectos',
