@@ -219,22 +219,69 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
         {/* 2. Degree ticks */}
         <g id="degree-ticks">{renderDegreeTicks()}</g>
 
+        {/* 2.5. 12 Sign Boundary Lines (extending from OUTER_RADIUS to CENTER) */}
+        <g id="sign-boundaries">
+          {Array.from({ length: 12 }).map((_, idx) => {
+            const angle = idx * 30;
+            const rad = (angle * Math.PI) / 180;
+            const x1 = CENTER + OUTER_RADIUS * Math.cos(rad);
+            const y1 = CENTER + OUTER_RADIUS * Math.sin(rad);
+            const x2 = CENTER;
+            const y2 = CENTER;
+
+            return (
+              <line
+                key={`sign-boundary-${idx}`}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="rgba(139, 92, 246, 0.22)"
+                strokeWidth="1"
+                className="transition-colors duration-300"
+              />
+            );
+          })}
+        </g>
+
         {/* 3. Concentric Orbit Tracks for Planets */}
         <g id="orbit-tracks">
           {Object.entries(ORBIT_MAPPING).map(([key, r]) => {
-            const isHighlighted = selectedPlanet === key;
+            const isHighlighted = selectedPlanet === key || hoveredPlanet === key;
+            const planetStyle = PLANET_STYLE_MAPPING[key];
+            const orbitColor = planetStyle ? planetStyle.color : 'rgba(139, 92, 246, 0.15)';
             return (
-              <circle
-                key={`orbit-${key}`}
-                cx={CENTER}
-                cy={CENTER}
-                r={r}
-                fill="none"
-                stroke={isHighlighted ? 'rgba(236, 72, 153, 0.25)' : 'rgba(139, 92, 246, 0.06)'}
-                strokeWidth={isHighlighted ? 1.5 : 1}
-                strokeDasharray={key === 'moon' ? '2 2' : '4 4'}
-                className="transition-colors duration-300"
-              />
+              <g key={`orbit-group-${key}`}>
+                {/* Glow layer when highlighted or hovered */}
+                {isHighlighted && (
+                  <circle
+                    cx={CENTER}
+                    cy={CENTER}
+                    r={r}
+                    fill="none"
+                    stroke={orbitColor}
+                    strokeWidth={3}
+                    opacity={0.3}
+                    style={{
+                      transition: 'all 0.3s ease',
+                      filter: 'blur(2px)'
+                    }}
+                  />
+                )}
+                {/* Main Orbit Line */}
+                <circle
+                  cx={CENTER}
+                  cy={CENTER}
+                  r={r}
+                  fill="none"
+                  stroke={orbitColor}
+                  strokeWidth={isHighlighted ? 1.8 : 0.8}
+                  opacity={isHighlighted ? 0.8 : 0.22}
+                  style={{
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+              </g>
             );
           })}
         </g>
