@@ -95,6 +95,10 @@ export default function Home() {
     state: string;
     country: string;
   } | null>(null);
+  const [copied, setCopied] = React.useState(false);
+  const [aiReading, setAiReading] = React.useState<string | null>(null);
+  const [aiLoading, setAiLoading] = React.useState(false);
+  const [aiError, setAiError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setMounted(true);
@@ -125,7 +129,99 @@ export default function Home() {
     setAstralData(null);
     setDate(new Date());
     setIsPlaying(true);
+    setAiReading(null);
+    setAiLoading(false);
+    setAiError(null);
   }, [setDate, setIsPlaying]);
+
+  const handleRequestAIInterpretation = React.useCallback(async () => {
+    if (!astralData || !planets) return;
+
+    setAiLoading(true);
+    setAiError(null);
+    setAiReading(null);
+
+    try {
+      const aspectList = calculateAllAspects(planets)
+        .map(a => `• ${a.p1} em ${a.label} com ${a.p2} (Orb: ${a.orb.toFixed(2)}°)`)
+        .join('\n');
+
+      const planetList = Object.entries(planets)
+        .map(([key, data]) => `• ${PLANET_TRANSLATIONS[key] || data.name}: ${formatAstrologicalPosition(data.longitude, data.symbol)} em ${ZODIAC_TRANSLATIONS[data.sign] || data.sign} (${data.retrograde ? 'Retrógrado' : 'Direto'})`)
+        .join('\n');
+
+      const response = await fetch('/api/astral-reading', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: astralData.name,
+          dateStr: `${astralData.date.toLocaleDateString('pt-BR')} às ${astralData.date.toLocaleTimeString('pt-BR')}`,
+          city: astralData.city,
+          state: astralData.state,
+          country: astralData.country,
+          planetsList: planetList,
+          aspectList: aspectList
+        })
+      });
+
+      const resData = await response.json();
+      if (!response.ok) {
+        throw new Error(resData.error || 'Erro ao consultar o oráculo de IA.');
+      }
+
+      setAiReading(resData.reading);
+    } catch (err: any) {
+      console.error(err);
+      setAiError(err.message || 'Erro de rede ou servidor ao conectar ao oráculo.');
+    } finally {
+      setAiLoading(false);
+    }
+  }, [astralData, planets]);
+
+  const handleCopyAIPrompt = React.useCallback(() => {
+    if (!astralData || !planets) return;
+
+    const aspectList = calculateAllAspects(planets)
+      .map(a => `• ${a.p1} em ${a.label} com ${a.p2} (Orb: ${a.orb.toFixed(2)}°)`)
+      .join('\n');
+
+    const planetList = Object.entries(planets)
+      .map(([key, data]) => `• ${PLANET_TRANSLATIONS[key] || data.name}: ${formatAstrologicalPosition(data.longitude, data.symbol)} em ${ZODIAC_TRANSLATIONS[data.sign] || data.sign} (${data.retrograde ? 'Retrógrado' : 'Direto'})`)
+      .join('\n');
+
+    const promptText = `Aja como um astrólogo profissional e experiente. Vou fornecer os dados detalhados do meu alinhamento cósmico de nascimento (Mapa Astral) calculado com precisão astronômica.
+
+Por favor, faça uma análise profunda, integrada e personalizada do meu Mapa Astral dividida nas seguintes seções:
+1. **Introdução Cósmica**: A assinatura de energia do meu nascimento.
+2. **Luminares e Essência**: Uma análise aprofundada do meu Sol e da minha Lua (e como eles interagem em termos de ego, essência e necessidades emocionais).
+3. **Cálculo do Ascendente**: A partir da minha hora e local exatos de nascimento, calcule e descreva o meu signo Ascendente, explicando como ele molda minha personalidade externa e primeira impressão.
+4. **Dinâmica dos Planetas**: Uma leitura detalhada da posição e energia de cada um dos seguintes planetas em seus respectivos signos:
+   - Mercúrio (comunicação e intelecto)
+   - Vênus (amor, valores e relacionamentos)
+   - Marte (ação, energia e assertividade)
+   - Júpiter (expansão e caminhos de sorte/sabedoria)
+   - Saturno (responsabilidade, desafios e amadurecimento)
+   - Urano, Netuno e Plutão (influências transpessoais e geracionais)
+5. **Linhas de Diálogo Cósmico (Aspectos Astrológicos)**: Interprete o impacto psicológico e prático de cada uma das seguintes relações e aspectos ativos entre os meus planetas no meu nascimento:
+${aspectList || 'Nenhum aspecto significativo ativo.'}
+
+Dados do Nascimento:
+- Nome do Peregrino: ${astralData.name}
+- Data: ${astralData.date.toLocaleDateString('pt-BR')} às ${astralData.date.toLocaleTimeString('pt-BR')}
+- Local de Nascimento: ${astralData.city}, ${astralData.state} - ${astralData.country}
+
+Coordenadas Planetárias Calculadas (Eclíptica Geocêntrica):
+${planetList}
+
+Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento, talentos naturais e áreas de superação baseados estritamente nesses dados.`;
+
+    navigator.clipboard.writeText(promptText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [astralData, planets]);
 
   if (!mounted) {
     return (
@@ -216,10 +312,17 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
+          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end flex-wrap gap-2 sm:gap-0">
+            <button
+              onClick={handleCopyAIPrompt}
+              className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 border border-pink-400/30 text-white transition-all cursor-pointer shadow-md shrink-0 active:scale-95"
+            >
+              <Sparkles size={13} className={copied ? "animate-bounce text-yellow-300" : "text-white"} />
+              <span>{copied ? "Prompt Copiado!" : "Copiar Prompt de IA"}</span>
+            </button>
             <button
               onClick={() => window.print()}
-              className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 border border-purple-400/30 text-white transition-all cursor-pointer shadow-md"
+              className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 border border-purple-400/30 text-white transition-all cursor-pointer shadow-md shrink-0"
             >
               <Printer size={13} />
               <span>Imprimir</span>
@@ -262,6 +365,75 @@ export default function Home() {
           />
         </div>
       </div>
+
+      {/* 2.5 Native AI Oracle Dashboard Card */}
+      {astralData && planets && (
+        <div className="glass-panel rounded-3xl p-6 md:p-8 bg-gradient-to-br from-purple-950/20 via-pink-950/10 to-purple-950/20 border border-purple-500/20 shadow-xl relative overflow-hidden w-full no-print">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-500/10 pb-4 mb-6">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-fuchsia-600 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20 shrink-0 animate-pulse">
+                <Sparkles className="text-white w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold font-outfit text-purple-100 flex items-center gap-2">
+                  Oráculo Cósmico de IA
+                </h3>
+                <p className="text-xs text-purple-400">
+                  Leitura interpretativa personalizada do seu alinhamento natal
+                </p>
+              </div>
+            </div>
+
+            {!aiReading && !aiLoading && (
+              <button
+                onClick={handleRequestAIInterpretation}
+                className="px-5 py-2.5 rounded-xl text-white font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 border border-purple-400/30 hover:border-pink-300/50 shadow-lg shadow-purple-500/20 text-xs uppercase tracking-wider flex items-center gap-2 transition-all duration-300 cursor-pointer self-start sm:self-auto active:scale-95 shrink-0"
+              >
+                <Sparkles size={14} className="text-white" />
+                Consultar Oráculo (Grátis)
+              </button>
+            )}
+          </div>
+
+          {aiLoading && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4 text-center">
+              <div className="relative w-16 h-16 flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border-2 border-purple-500/10 border-t-purple-500 animate-spin" />
+                <Sparkles className="text-purple-400 w-6 h-6 animate-pulse" />
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-purple-200 uppercase tracking-widest animate-pulse">
+                  Alinhando Efemérides com o Oráculo...
+                </h4>
+                <p className="text-xs text-purple-400 max-w-xs mt-1">
+                  A IA está decodificando seus luminares, ascendente e aspectos natais.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {aiError && (
+            <div className="p-5 rounded-xl border border-red-500/25 bg-red-950/20 text-red-400 text-xs text-center space-y-3 max-w-xl mx-auto">
+              <p className="leading-relaxed">{aiError}</p>
+              <button
+                onClick={handleRequestAIInterpretation}
+                className="px-4 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-300 transition-all font-bold text-xs uppercase tracking-wide cursor-pointer"
+              >
+                Tentar Novamente
+              </button>
+            </div>
+          )}
+
+          {aiReading && (
+            <div className="space-y-4 text-purple-100 text-[13px] leading-[1.8] whitespace-pre-line text-left bg-purple-950/10 p-6 rounded-2xl border border-purple-500/10 max-h-[500px] overflow-y-auto font-sans scrollbar-thin">
+              {aiReading}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 3. Bottom Controls Cockpit Deck */}
       <footer className="w-full">
@@ -453,6 +625,18 @@ export default function Home() {
               </table>
             )}
           </div>
+
+          {/* Section 4: AI Interpretation (For Print/PDF) */}
+          {aiReading && (
+            <div className="space-y-4 w-full pt-6 border-t border-gray-300 page-break-before">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-200 pb-1.5 w-full">
+                Leitura e Análise do Oráculo de IA
+              </h2>
+              <div className="text-xs text-gray-800 leading-relaxed whitespace-pre-wrap text-justify bg-gray-50 p-4 rounded-xl border border-gray-200 font-sans">
+                {aiReading}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
