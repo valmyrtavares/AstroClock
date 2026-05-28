@@ -121,6 +121,75 @@ function getZodiacSignForDegree(degree: number) {
   return signs[index];
 }
 
+function parseInlineMarkdown(text: string) {
+  const parts = text.split('**');
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return <strong key={index} className="font-bold text-pink-400 print:text-black">{part}</strong>;
+    }
+    const subparts = part.split('*');
+    if (subparts.length > 1) {
+      return subparts.map((subpart, subidx) => {
+        if (subidx % 2 === 1) {
+          return <strong key={subidx} className="font-semibold text-purple-300 print:text-gray-900">{subpart}</strong>;
+        }
+        return subpart;
+      });
+    }
+    return part;
+  });
+}
+
+function renderFormattedMarkdown(text: string, isPrint: boolean = false) {
+  if (!text) return null;
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith('### ')) {
+      const content = trimmed.substring(4);
+      return (
+        <h4 key={idx} className={`font-bold mt-4 mb-2 text-base ${isPrint ? 'text-gray-900 border-b border-gray-100 pb-1' : 'text-purple-200'}`}>
+          {parseInlineMarkdown(content)}
+        </h4>
+      );
+    }
+    if (trimmed.startsWith('## ')) {
+      const content = trimmed.substring(3);
+      return (
+        <h3 key={idx} className={`font-bold mt-5 mb-2.5 text-lg ${isPrint ? 'text-gray-950 border-b border-gray-200 pb-1' : 'text-pink-300'}`}>
+          {parseInlineMarkdown(content)}
+        </h3>
+      );
+    }
+    if (trimmed.startsWith('# ')) {
+      const content = trimmed.substring(2);
+      return (
+        <h2 key={idx} className={`font-bold mt-6 mb-3 text-xl ${isPrint ? 'text-black border-b-2 border-gray-300 pb-1.5' : 'text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200'}`}>
+          {parseInlineMarkdown(content)}
+        </h2>
+      );
+    }
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      const content = trimmed.substring(2);
+      return (
+        <ul key={idx} className="list-disc pl-5 my-1.5" style={{ listStyleType: 'disc' }}>
+          <li className={`${isPrint ? 'text-gray-800' : 'text-purple-100'} text-[13px] md:text-sm`}>
+            {parseInlineMarkdown(content)}
+          </li>
+        </ul>
+      );
+    }
+    if (trimmed === '') {
+      return <div key={idx} className="h-2" />;
+    }
+    return (
+      <p key={idx} className={`${isPrint ? 'text-gray-800' : 'text-purple-100'} text-[13px] md:text-sm my-2 leading-[1.8] text-justify`}>
+        {parseInlineMarkdown(line)}
+      </p>
+    );
+  });
+}
+
 export default function Home() {
   const [mounted, setMounted] = React.useState(false);
   const [knowledgeOpen, setKnowledgeOpen] = React.useState(false);
@@ -199,6 +268,9 @@ export default function Home() {
         .map(([key, data]) => `• ${PLANET_TRANSLATIONS[key] || data.name}: ${formatAstrologicalPosition(data.longitude, data.symbol)} em ${ZODIAC_TRANSLATIONS[data.sign] || data.sign} (${data.retrograde ? 'Retrógrado' : 'Direto'})`)
         .join('\n');
 
+      const ascDegree = calculateAscendant(date, astralData.lat, astralData.lon);
+      const ascSign = getZodiacSignForDegree(ascDegree);
+
       const response = await fetch('/api/astral-reading', {
         method: 'POST',
         headers: {
@@ -211,7 +283,9 @@ export default function Home() {
           state: astralData.state,
           country: astralData.country,
           planetsList: planetList,
-          aspectList: aspectList
+          aspectList: aspectList,
+          ascendantSign: ascSign,
+          ascendantDegree: ascDegree.toFixed(2)
         })
       });
 
@@ -480,8 +554,8 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
           )}
 
           {aiReading && (
-            <div className="space-y-4 text-purple-100 text-[13px] leading-[1.8] whitespace-pre-line text-left bg-purple-950/10 p-6 rounded-2xl border border-purple-500/10 max-h-[500px] overflow-y-auto font-sans scrollbar-thin">
-              {aiReading}
+            <div className="space-y-3.5 text-purple-100 text-[14px] leading-[1.8] text-left bg-purple-950/10 p-6 rounded-2xl border border-purple-500/10 max-h-[500px] overflow-y-auto font-sans scrollbar-thin">
+              {renderFormattedMarkdown(aiReading, false)}
             </div>
           )}
         </div>
@@ -638,6 +712,30 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
                     </tr>
                   );
                 })}
+                {/* Ascendente Row */}
+                {astralData && (
+                  <tr className="text-gray-800 bg-pink-50/20 font-semibold">
+                    <td className="border border-gray-300 px-3 py-1.5 font-bold flex items-center gap-1.5 text-pink-700">
+                      <span className="text-sm font-sans">ASC</span>
+                      Ascendente
+                    </td>
+                    <td className="border border-gray-300 px-3 py-1.5 font-mono text-pink-700">
+                      {formatAstrologicalPosition(
+                        calculateAscendant(date, astralData.lat, astralData.lon),
+                        'ASC'
+                      )}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-1.5 text-pink-700">
+                      {getZodiacSignForDegree(calculateAscendant(date, astralData.lat, astralData.lon))}
+                    </td>
+                    <td className="border border-gray-300 px-3 py-1.5 text-right font-mono text-gray-400">
+                      -
+                    </td>
+                    <td className="border border-gray-300 px-3 py-1.5 text-center text-pink-600 font-semibold">
+                      Ponto Cardeal
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -691,8 +789,8 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
               <h2 className="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-200 pb-1.5 w-full">
                 Leitura e Análise do Oráculo de IA
               </h2>
-              <div className="text-xs text-gray-800 leading-relaxed whitespace-pre-wrap text-justify bg-gray-50 p-4 rounded-xl border border-gray-200 font-sans">
-                {aiReading}
+              <div className="text-[13px] text-gray-800 leading-relaxed text-justify bg-gray-50 p-6 rounded-xl border border-gray-200 font-sans">
+                {renderFormattedMarkdown(aiReading, true)}
               </div>
             </div>
           )}

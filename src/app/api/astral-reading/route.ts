@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, dateStr, city, state, country, planetsList, aspectList } = await request.json();
+    const { name, dateStr, city, state, country, planetsList, aspectList, ascendantSign, ascendantDegree } = await request.json();
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -19,6 +19,7 @@ Dados do Nascimento:
 - Nome do Peregrino: ${name}
 - Data e Hora: ${dateStr}
 - Local de Nascimento: ${city}, ${state} - ${country}
+- Signo Ascendente Calculado: ${ascendantSign} (${ascendantDegree}°)
 
 Coordenadas Planetárias Calculadas (Eclíptica Geocêntrica):
 ${planetsList}
@@ -29,7 +30,7 @@ ${aspectList || 'Nenhum aspecto significativo ativo.'}
 Estruture a leitura em português de forma clara, empoderadora e inspiradora em 4 seções principais usando Markdown:
 1. **Introdução Cósmica**: A assinatura de energia essencial do nascimento.
 2. **Luminares e Equilíbrio Essencial (Sol e Lua)**: Análise profunda do Sol (sua essência, propósito de ego) e da Lua (suas reações, necessidades emocionais e instintos), mostrando como equilibrá-los.
-3. **Ascendente e Dinâmica de Expressão**: Com base na data/hora e coordenadas fornecidas, deduza/interprete o signo Ascendente e descreva a sua importância como a sua máscara social e primeira impressão, relacionando com a energia dos planetas pessoais (Mercúrio, Vênus, Marte).
+3. **Ascendente e Dinâmica de Expressão (Ascendente em ${ascendantSign})**: Uma análise aprofundada do seu signo Ascendente (${ascendantSign} a ${ascendantDegree}°). Explique em detalhes como este signo atua como sua máscara social, sua primeira impressão física/comportamental ao mundo e o canal de manifestação da sua jornada. Conecte o Ascendente com a dinâmica dos planetas pessoais (Mercúrio, Vênus, Marte).
 4. **Caminho Evolutivo (Aspectos e Superação)**: Uma leitura integradora de como os aspectos planetários listados agem como potenciais natos e desafios dinâmicos a serem superados em sua jornada de autoconhecimento.
 
 Traga uma análise profunda, acolhedora e construtiva, sem jargões desnecessários, focando em conselhos evolutivos de autoconhecimento.`;

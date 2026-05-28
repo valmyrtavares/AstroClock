@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Calendar, Clock, MapPin, User, Info } from 'lucide-react';
+import { BRAZIL_STATES } from '../data/brazilPlaces';
 
 interface AstralMapModalProps {
   isOpen: boolean;
@@ -26,11 +27,19 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
   const [second, setSecond] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
+  const [state, setState] = useState('SP');
+  const [city, setCity] = useState('São Paulo');
   const [country, setCountry] = useState('Brasil');
   const [error, setError] = useState<string | null>(null);
   const [geocoding, setGeocoding] = useState(false);
+
+  const handleStateChange = (newVal: string) => {
+    setState(newVal);
+    const foundState = BRAZIL_STATES.find(s => s.sigla === newVal);
+    if (foundState && foundState.cidades.length > 0) {
+      setCity(foundState.cidades[0]);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -201,7 +210,7 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Valmyr Tavares"
+                placeholder="Ex: Marco Aurélio"
                 className="w-full px-4 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 hover:border-purple-500/20 focus:border-purple-500/40 text-purple-100 placeholder-purple-500/50 text-sm focus:outline-none transition-all"
                 required
               />
@@ -293,22 +302,36 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
                 Local de Nascimento
               </label>
               <div className="grid grid-cols-3 gap-3">
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Cidade"
-                  className="w-full px-4 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 focus:border-purple-500/40 text-purple-100 placeholder-purple-500/50 text-sm focus:outline-none transition-all col-span-1"
-                  required
-                />
-                <input
-                  type="text"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  placeholder="Estado"
-                  className="w-full px-4 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 focus:border-purple-500/40 text-purple-100 placeholder-purple-500/50 text-sm focus:outline-none transition-all col-span-1"
-                  required
-                />
+                <div className="col-span-1">
+                  <select
+                    value={state}
+                    onChange={(e) => handleStateChange(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 focus:border-purple-500/40 text-purple-100 text-sm focus:outline-none transition-all cursor-pointer appearance-none"
+                    style={{ backgroundImage: 'radial-gradient(circle at 100% 50%, rgba(139, 92, 246, 0.1), transparent)' }}
+                    required
+                  >
+                    {BRAZIL_STATES.map((s) => (
+                      <option key={s.sigla} value={s.sigla} className="bg-purple-950 text-purple-100">
+                        {s.sigla} - {s.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-1">
+                  <select
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl bg-purple-950/20 border border-purple-500/10 focus:border-purple-500/40 text-purple-100 text-sm focus:outline-none transition-all cursor-pointer appearance-none"
+                    style={{ backgroundImage: 'radial-gradient(circle at 100% 50%, rgba(139, 92, 246, 0.1), transparent)' }}
+                    required
+                  >
+                    {((BRAZIL_STATES.find((s) => s.sigla === state)?.cidades) || []).map((c) => (
+                      <option key={c} value={c} className="bg-purple-950 text-purple-100">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <input
                   type="text"
                   value={country}
