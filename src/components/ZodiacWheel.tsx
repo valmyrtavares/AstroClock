@@ -13,6 +13,7 @@ interface ZodiacWheelProps {
   planets: PlanetsData | null;
   selectedPlanet: string | null;
   onSelectPlanet: (planetKey: string | null) => void;
+  ascendant?: number | null;
 }
 
 const ZODIAC_SIGNS = [
@@ -51,7 +52,7 @@ export const ORBIT_MAPPING: Record<string, number> = {
   pluto: 345
 };
 
-export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacWheelProps) {
+export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet, ascendant = null }: ZodiacWheelProps) {
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
   const [hoveredSign, setHoveredSign] = useState<string | null>(null);
 
@@ -296,6 +297,53 @@ export function ZodiacWheel({ planets, selectedPlanet, onSelectPlanet }: ZodiacW
         {/* Core Astrological cross (Asc/Desc, MC/IC grid guidelines) */}
         <line x1={CENTER - INNER_RADIUS} y1={CENTER} x2={CENTER + INNER_RADIUS} y2={CENTER} stroke="rgba(139, 92, 246, 0.04)" strokeWidth="1" />
         <line x1={CENTER} y1={CENTER - INNER_RADIUS} x2={CENTER} y2={CENTER + INNER_RADIUS} stroke="rgba(139, 92, 246, 0.04)" strokeWidth="1" />
+
+        {/* 5.5 Ascendant Indicator Line */}
+        {ascendant !== null && (
+          <g id="ascendant-indicator" className="transition-all duration-300">
+            {/* Soft backdrop glow line */}
+            <line
+              x1={CENTER}
+              y1={CENTER}
+              x2={CENTER + (OUTER_RADIUS + 5) * Math.cos((ascendant * Math.PI) / 180)}
+              y2={CENTER + (OUTER_RADIUS + 5) * Math.sin((ascendant * Math.PI) / 180)}
+              stroke="rgba(236, 72, 153, 0.35)"
+              strokeWidth="5"
+              style={{ filter: 'blur(3px)' }}
+            />
+            {/* Main high-contrast solid indicator line */}
+            <line
+              x1={CENTER}
+              y1={CENTER}
+              x2={CENTER + (OUTER_RADIUS + 5) * Math.cos((ascendant * Math.PI) / 180)}
+              y2={CENTER + (OUTER_RADIUS + 5) * Math.sin((ascendant * Math.PI) / 180)}
+              stroke="#ec4899"
+              strokeWidth="2.5"
+              strokeDasharray="none"
+            />
+            {/* Label box */}
+            <circle
+              cx={CENTER + (OUTER_RADIUS + 25) * Math.cos((ascendant * Math.PI) / 180)}
+              cy={CENTER + (OUTER_RADIUS + 25) * Math.sin((ascendant * Math.PI) / 180)}
+              r="16"
+              fill="#080412"
+              stroke="#ec4899"
+              strokeWidth="1.5"
+              style={{ filter: 'drop-shadow(0 0 5px rgba(236,72,153,0.3))' }}
+            />
+            {/* Label text */}
+            <text
+              x={CENTER + (OUTER_RADIUS + 25) * Math.cos((ascendant * Math.PI) / 180)}
+              y={CENTER + (OUTER_RADIUS + 25) * Math.sin((ascendant * Math.PI) / 180) + 4}
+              textAnchor="middle"
+              fill="#ec4899"
+              className="font-bold text-[10px] font-mono tracking-tighter"
+              style={{ fontSize: '10px', fontWeight: 'bold' }}
+            >
+              ASC
+            </text>
+          </g>
+        )}
 
         {/* 6. Glowing Planet Markers */}
         <g id="planet-markers">

@@ -83,6 +83,44 @@ function calculateAllAspects(planets: Record<string, any>) {
   return aspects;
 }
 
+function calculateAscendant(date: Date, latitude: number, longitude: number): number {
+  // Convert date to UTC Julian Date
+  const time = date.getTime();
+  const jd = (time / 86400000) + 2440587.5;
+  const T = (jd - 2451545.0) / 36525.0;
+  
+  // Greenwich Mean Sidereal Time in degrees
+  let gmst = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + T * T * (0.000387933 - T / 38710000);
+  gmst = (gmst % 360 + 360) % 360;
+  
+  // Local Sidereal Time in degrees
+  let lst = gmst + longitude;
+  lst = (lst % 360 + 360) % 360;
+  
+  const ramcRad = (lst * Math.PI) / 180;
+  const latRad = (latitude * Math.PI) / 180;
+  
+  // Obliquity of Ecliptic (approx 23.4392911 degrees)
+  const obliquity = 23.4392911;
+  const obRad = (obliquity * Math.PI) / 180;
+  
+  const y = Math.cos(ramcRad);
+  const x = -Math.sin(ramcRad) * Math.cos(obRad) - Math.tan(latRad) * Math.sin(obRad);
+  
+  let ascRad = Math.atan2(y, x);
+  let ascDeg = (ascRad * 180) / Math.PI;
+  return (ascDeg + 360) % 360;
+}
+
+function getZodiacSignForDegree(degree: number) {
+  const index = Math.floor(degree / 30) % 12;
+  const signs = [
+    'Áries', 'Touro', 'Gêmeos', 'Câncer', 'Leão', 'Virgem',
+    'Libra', 'Escorpião', 'Sagitário', 'Capricórnio', 'Aquário', 'Peixes'
+  ];
+  return signs[index];
+}
+
 export default function Home() {
   const [mounted, setMounted] = React.useState(false);
   const [knowledgeOpen, setKnowledgeOpen] = React.useState(false);
@@ -94,14 +132,25 @@ export default function Home() {
     city: string;
     state: string;
     country: string;
+    lat: number;
+    lon: number;
   } | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [aiReading, setAiReading] = React.useState<string | null>(null);
   const [aiLoading, setAiLoading] = React.useState(false);
   const [aiError, setAiError] = React.useState<string | null>(null);
+  const [currentCoords, setCurrentCoords] = React.useState({ lat: -23.5505, lon: -46.6333 }); // Default São Paulo
 
   React.useEffect(() => {
     setMounted(true);
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCurrentCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        },
+        (err) => console.log('Usando localização padrão (São Paulo)')
+      );
+    }
   }, []);
 
   const {
@@ -309,6 +358,8 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
                 Nascimento: <strong className="text-purple-100">{astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</strong>
                 <span className="mx-2 text-purple-500">•</span>
                 Local: <strong className="text-purple-100">{astralData.city}, {astralData.state} - {astralData.country}</strong>
+                <span className="mx-2 text-purple-500">•</span>
+                Ascendente: <strong className="text-pink-400">{getZodiacSignForDegree(calculateAscendant(date, astralData.lat, astralData.lon))} ({calculateAscendant(date, astralData.lat, astralData.lon).toFixed(1)}°)</strong>
               </p>
             </div>
           </div>
@@ -352,6 +403,7 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
             planets={planets}
             selectedPlanet={selectedPlanet}
             onSelectPlanet={setSelectedPlanet}
+            ascendant={calculateAscendant(date, astralData ? astralData.lat : currentCoords.lat, astralData ? astralData.lon : currentCoords.lon)}
           />
         </div>
 
@@ -512,10 +564,16 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
                   {astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR')}
                 </span>
               </div>
-              <div className="col-span-2">
+              <div>
                 <span className="text-[10px] text-gray-400 font-semibold uppercase block">Local de Nascimento</span>
                 <span className="font-bold text-gray-800">
                   {astralData.city}, {astralData.state} - {astralData.country}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase block">Ascendente</span>
+                <span className="font-bold text-pink-600">
+                  {getZodiacSignForDegree(calculateAscendant(date, astralData.lat, astralData.lon))} ({calculateAscendant(date, astralData.lat, astralData.lon).toFixed(1)}°)
                 </span>
               </div>
             </div>
@@ -531,6 +589,7 @@ Traga insights profundos, empoderadores e práticos voltados ao autoconhecimento
                 planets={planets}
                 selectedPlanet={null}
                 onSelectPlanet={() => {}}
+                ascendant={calculateAscendant(date, astralData.lat, astralData.lon)}
               />
             </div>
           </div>

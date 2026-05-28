@@ -34,7 +34,8 @@ Estruture a leitura em português de forma clara, empoderadora e inspiradora em 
 
 Traga uma análise profunda, acolhedora e construtiva, sem jargões desnecessários, focando em conselhos evolutivos de autoconhecimento.`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    let model = 'gemini-2.5-flash';
+    let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -51,6 +52,35 @@ Traga uma análise profunda, acolhedora e construtiva, sem jargões desnecessár
         ]
       })
     });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      const errMsg = errData?.error?.message || '';
+      
+      // If primary model is busy/throttled, immediately attempt fallback to gemini-1.5-flash
+      if (errMsg.includes('high demand') || errMsg.includes('limit') || response.status === 429 || response.status === 503) {
+        console.warn(`Primary model ${model} busy. Swapping to fallback gemini-1.5-flash...`);
+        model = 'gemini-1.5-flash';
+        
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: promptText
+                  }
+                ]
+              }
+            ]
+          })
+        });
+      }
+    }
 
     if (!response.ok) {
       const errData = await response.json();

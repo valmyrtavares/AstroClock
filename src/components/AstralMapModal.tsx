@@ -13,6 +13,8 @@ interface AstralMapModalProps {
     city: string;
     state: string;
     country: string;
+    lat: number;
+    lon: number;
   }) => void;
 }
 
@@ -28,6 +30,7 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
   const [state, setState] = useState('');
   const [country, setCountry] = useState('Brasil');
   const [error, setError] = useState<string | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
 
   if (!isOpen) return null;
 
@@ -84,14 +87,50 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
       return;
     }
 
-    onGenerate({
-      name: name.trim(),
-      date: birthDate,
-      city: city.trim(),
-      state: state.trim(),
-      country: country.trim(),
-    });
-    onClose();
+    setGeocoding(true);
+    const query = `${city.trim()}, ${state.trim()}, ${country.trim()}`;
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'AstroClock/1.0 (Astrological Alignment Clock)'
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        let lat = -23.5505; // Fallback SP
+        let lon = -46.6333;
+        if (data && data.length > 0) {
+          lat = parseFloat(data[0].lat);
+          lon = parseFloat(data[0].lon);
+        }
+        
+        onGenerate({
+          name: name.trim(),
+          date: birthDate,
+          city: city.trim(),
+          state: state.trim(),
+          country: country.trim(),
+          lat,
+          lon
+        });
+        setGeocoding(false);
+        onClose();
+      })
+      .catch(err => {
+        console.error('Erro de geocodificação:', err);
+        // Fallback gracefully on network error so the pilgrim is never blocked!
+        onGenerate({
+          name: name.trim(),
+          date: birthDate,
+          city: city.trim(),
+          state: state.trim(),
+          country: country.trim(),
+          lat: -23.5505,
+          lon: -46.6333
+        });
+        setGeocoding(false);
+        onClose();
+      });
   };
 
   return (
@@ -292,10 +331,20 @@ export function AstralMapModal({ isOpen, onClose, onGenerate }: AstralMapModalPr
               </button>
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl text-white font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 border border-purple-400/30 hover:border-pink-300/50 shadow-lg shadow-purple-500/20 text-xs uppercase tracking-wide flex items-center gap-1.5 transition-all duration-300 cursor-pointer"
+                disabled={geocoding}
+                className="px-5 py-2.5 rounded-xl text-white font-bold bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 border border-purple-400/30 hover:border-pink-300/50 shadow-lg shadow-purple-500/20 text-xs uppercase tracking-wide flex items-center gap-1.5 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Sparkles size={13} />
-                Gerar Mapa Astral
+                {geocoding ? (
+                  <>
+                    <div className="w-3.5 h-3.5 rounded-full border border-t-transparent border-white animate-spin shrink-0" />
+                    <span>Calculando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={13} />
+                    <span>Gerar Mapa Astral</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
