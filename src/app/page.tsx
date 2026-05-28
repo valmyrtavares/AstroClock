@@ -10,6 +10,78 @@ import { KnowledgeDrawer } from '../components/KnowledgeDrawer';
 import { AuthorCard } from '../components/AuthorCard';
 import { Compass, Sparkles, Menu, Printer, RotateCcw } from 'lucide-react';
 import { AstralMapModal } from '../components/AstralMapModal';
+import { formatAstrologicalPosition } from '../components/PlanetSidebar';
+
+const PLANET_TRANSLATIONS: Record<string, string> = {
+  sun: 'Sol',
+  moon: 'Lua',
+  mercury: 'Mercúrio',
+  venus: 'Vênus',
+  mars: 'Marte',
+  jupiter: 'Júpiter',
+  saturn: 'Saturno',
+  uranus: 'Urano',
+  neptune: 'Netuno',
+  pluto: 'Plutão'
+};
+
+const ZODIAC_TRANSLATIONS: Record<string, string> = {
+  Aries: 'Áries',
+  Taurus: 'Touro',
+  Gemini: 'Gêmeos',
+  Cancer: 'Câncer',
+  Leo: 'Leão',
+  Virgo: 'Virgem',
+  Libra: 'Libra',
+  Scorpio: 'Escorpião',
+  Sagittarius: 'Sagitário',
+  Capricorn: 'Capricórnio',
+  Aquarius: 'Aquário',
+  Pisces: 'Peixes'
+};
+
+const ASPECTS_CONFIG = [
+  { type: 'conjunction', target: 0, orb: 8, label: 'Conjunção' },
+  { type: 'sextile', target: 60, orb: 6, label: 'Sextil' },
+  { type: 'square', target: 90, orb: 8, label: 'Quadratura' },
+  { type: 'trine', target: 120, orb: 8, label: 'Trígono' },
+  { type: 'opposition', target: 180, orb: 8, label: 'Oposição' }
+];
+
+function calculateAllAspects(planets: Record<string, any>) {
+  const aspects = [];
+  const keys = Object.keys(planets);
+  
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const p1 = keys[i];
+      const p2 = keys[j];
+      if (!planets[p1] || !planets[p2]) continue;
+      
+      const lon1 = planets[p1].longitude;
+      const lon2 = planets[p2].longitude;
+
+      let diff = Math.abs(lon1 - lon2);
+      if (diff > 180) diff = 360 - diff;
+
+      for (const config of ASPECTS_CONFIG) {
+        const distanceToTarget = Math.abs(diff - config.target);
+        if (distanceToTarget <= config.orb) {
+          aspects.push({
+            p1: PLANET_TRANSLATIONS[p1] || p1,
+            p2: PLANET_TRANSLATIONS[p2] || p2,
+            p1Symbol: planets[p1].symbol,
+            p2Symbol: planets[p2].symbol,
+            label: config.label,
+            orb: distanceToTarget
+          });
+          break;
+        }
+      }
+    }
+  }
+  return aspects;
+}
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false);
@@ -71,30 +143,10 @@ export default function Home() {
   }
 
   return (
-    <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-between space-y-4 md:space-y-6 min-h-screen overflow-x-hidden">
+    <>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-between space-y-4 md:space-y-6 min-h-screen overflow-x-hidden no-print">
       
-      {/* Print-only layout header */}
-      {astralData && (
-        <div className="hidden print-only flex-col items-center justify-center text-center pb-6 border-b border-gray-300 mb-6 text-black">
-          <h1 className="text-3xl font-extrabold uppercase tracking-widest text-black font-outfit">
-            AstroClock
-          </h1>
-          <p className="text-sm font-semibold tracking-wider text-gray-600 uppercase mt-1">
-            Mapa Astral de Nascimento
-          </p>
-          <div className="mt-4 px-6 py-3 border border-gray-300 rounded-xl bg-gray-50 max-w-xl text-center">
-            <p className="text-lg font-bold text-gray-800">
-              {astralData.name}
-            </p>
-            <p className="text-xs text-gray-600 mt-1 font-mono">
-              Data: {astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR')}
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5 font-mono">
-              Local: {astralData.city}, {astralData.state} - {astralData.country}
-            </p>
-          </div>
-        </div>
-      )}
+      {/* We removed the old print header since we now use the full printable layout at the bottom */}
 
       {/* 1. Header Navigation Glassmorphic Panel */}
       <header className="glass-panel rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -264,6 +316,146 @@ export default function Home() {
         onGenerate={handleGenerateAstralMap}
       />
 
-    </main>
+      </main>
+
+      {/* 8. Dedicated Print-Only High-Fidelity Layout */}
+      {astralData && planets && (
+        <div className="print-block flex-col text-black p-8 space-y-8 bg-white min-h-screen w-full">
+          {/* Header */}
+          <div className="text-center border-b-2 border-gray-300 pb-6 w-full">
+            <h1 className="text-3xl font-extrabold tracking-widest uppercase font-outfit text-black">
+              AstroClock
+            </h1>
+            <p className="text-xs font-bold tracking-wider text-gray-500 uppercase mt-1">
+              Mapa Astral de Nascimento
+            </p>
+            <div className="mt-4 px-6 py-3 border border-gray-300 rounded-xl bg-gray-50 max-w-xl mx-auto text-left grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase block">Peregrino</span>
+                <span className="font-bold text-gray-800">{astralData.name}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-gray-400 font-semibold uppercase block">Data e Hora</span>
+                <span className="font-bold text-gray-800">
+                  {astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR')}
+                </span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-[10px] text-gray-400 font-semibold uppercase block">Local de Nascimento</span>
+                <span className="font-bold text-gray-800">
+                  {astralData.city}, {astralData.state} - {astralData.country}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 1: Zodiac Wheel Drawing */}
+          <div className="flex flex-col items-center justify-center space-y-4 page-break-after w-full">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-200 pb-1.5 w-full text-center">
+              Desenho do Céu Astral
+            </h2>
+            <div className="w-[450px] h-[450px] flex items-center justify-center mx-auto print-svg-container">
+              <ZodiacWheel
+                planets={planets}
+                selectedPlanet={null}
+                onSelectPlanet={() => {}}
+              />
+            </div>
+          </div>
+
+          {/* Section 2: Planets Coordinates Table */}
+          <div className="space-y-4 page-break-after w-full">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-200 pb-1.5 w-full">
+              Posições Celestes (Coordenadas Geocêntricas)
+            </h2>
+            <table className="w-full border-collapse border border-gray-300 text-xs">
+              <thead>
+                <tr className="bg-gray-100 text-gray-700">
+                  <th className="border border-gray-300 px-3 py-1.5 text-left">Astro</th>
+                  <th className="border border-gray-300 px-3 py-1.5 text-left">Zodíaco (Longitude)</th>
+                  <th className="border border-gray-300 px-3 py-1.5 text-left">Signo</th>
+                  <th className="border border-gray-300 px-3 py-1.5 text-right">Velocidade</th>
+                  <th className="border border-gray-300 px-3 py-1.5 text-center">Movimento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(planets).map(([key, data]) => {
+                  const translatedName = PLANET_TRANSLATIONS[key] || data.name;
+                  const translatedSign = ZODIAC_TRANSLATIONS[data.sign] || data.sign;
+                  return (
+                    <tr key={key} className="text-gray-800 odd:bg-gray-50/50">
+                      <td className="border border-gray-300 px-3 py-1.5 font-bold flex items-center gap-1.5">
+                        <span className="text-sm font-sans">{data.symbol}</span>
+                        {translatedName}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 font-mono">
+                        {formatAstrologicalPosition(data.longitude, data.symbol)}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5">
+                        {translatedSign}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 text-right font-mono">
+                        {data.speed > 0 ? '+' : ''}{data.speed.toFixed(4)}°/d
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 text-center">
+                        {data.retrograde ? (
+                          <span className="text-orange-700 font-bold">Retrógrado (℞)</span>
+                        ) : (
+                          <span className="text-green-700 font-semibold">Direto</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Section 3: Astrological Relations (Aspects) */}
+          <div className="space-y-4 w-full">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-700 border-b border-gray-200 pb-1.5 w-full">
+              Aspectos Astrológicos (Relações entre Astros)
+            </h2>
+            {calculateAllAspects(planets).length === 0 ? (
+              <p className="text-xs text-gray-500 italic">
+                Nenhum aspecto astrológico ativo no momento do nascimento.
+              </p>
+            ) : (
+              <table className="w-full border-collapse border border-gray-300 text-xs">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-700">
+                    <th className="border border-gray-300 px-3 py-1.5 text-left">Astro 1</th>
+                    <th className="border border-gray-300 px-3 py-1.5 text-center">Relação (Aspecto)</th>
+                    <th className="border border-gray-300 px-3 py-1.5 text-right">Astro 2</th>
+                    <th className="border border-gray-300 px-3 py-1.5 text-center">Orb (Diferença)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calculateAllAspects(planets).map((aspect, idx) => (
+                    <tr key={idx} className="text-gray-800 odd:bg-gray-50/50">
+                      <td className="border border-gray-300 px-3 py-1.5 font-semibold">
+                        <span className="text-sm font-sans mr-1">{aspect.p1Symbol}</span>
+                        {aspect.p1}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 text-center font-bold text-purple-700">
+                        {aspect.label}
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 font-semibold text-right">
+                        {aspect.p2}
+                        <span className="text-sm font-sans ml-1">{aspect.p2Symbol}</span>
+                      </td>
+                      <td className="border border-gray-300 px-3 py-1.5 text-center font-mono">
+                        {aspect.orb.toFixed(2)}°
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+    </>
   );
 }

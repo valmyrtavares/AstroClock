@@ -220,12 +220,11 @@ body {
    Print Layout Styles for High-Quality Birth Charts
    ========================================================================== */
 @media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  /* Hide background starry elements and ambient glows */
+  /* Hide the entire interactive dark application completely */
+  main,
+  header,
+  footer,
+  aside,
   .stars-bg,
   .stars-bg-dense,
   .nebula-purple,
@@ -233,59 +232,30 @@ body {
   #ambient-stars,
   #ambient-stars-dense,
   #ambient-nebula-1,
-  #ambient-nebula-2 {
+  #ambient-nebula-2,
+  .no-print {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
   }
 
-  /* Hide non-printable interactive controls and navigation */
-  header,
-  footer,
-  aside,
-  button,
-  .no-print,
-  .glass-panel:not(.print-only) {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-  }
-
-  /* Reset main layout container for print spacing */
-  main {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: transparent !important;
-    display: block !important;
-    min-height: auto !important;
-  }
-
-  /* Ensure print header is beautifully visible */
-  .print-only {
+  /* Show our custom high-fidelity printing template */
+  .print-block {
     display: flex !important;
   }
 
-  /* Hide sidebar in print so the wheel takes center stage */
-  .col-span-12.lg\:col-span-4 {
-    display: none !important;
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 
-  /* Center the Zodiac Wheel container and style it cleanly */
-  .col-span-12.lg\:col-span-8 {
-    grid-column: span 12 / span 12 !important;
-    width: 100% !important;
-    max-width: 580px !important;
-    margin: 0 auto !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    min-height: auto !important;
-    aspect-ratio: 1 / 1 !important;
+  /* Ensure page breaks look gorgeous */
+  .page-break-after {
+    page-break-after: always;
+    break-after: page;
   }
 
-  /* Ensure all SVG paths, text, circles are dark/high-contrast for physical printing */
+  /* Make sure SVGs and drawing components render flawlessly on white */
   svg text {
     fill: #111111 !important;
     text-shadow: none !important;
@@ -297,11 +267,13 @@ body {
     stroke: #333333 !important;
     stroke-opacity: 0.85 !important;
   }
+}
 
-  /* Maintain aspect ratio and size of zodiac SVGs in print */
-  svg {
-    max-height: 100% !important;
-    max-width: 100% !important;
+/* Hide the print layout on interactive screen display */
+@media screen {
+  .print-block {
+    display: none !important;
   }
 }
+
 
