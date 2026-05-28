@@ -8,12 +8,21 @@ import { TimeControls } from '../components/TimeControls';
 import { AspectModal } from '../components/AspectModal';
 import { KnowledgeDrawer } from '../components/KnowledgeDrawer';
 import { AuthorCard } from '../components/AuthorCard';
-import { Compass, Sparkles, Menu } from 'lucide-react';
+import { Compass, Sparkles, Menu, Printer, RotateCcw } from 'lucide-react';
+import { AstralMapModal } from '../components/AstralMapModal';
 
 export default function Home() {
   const [mounted, setMounted] = React.useState(false);
   const [knowledgeOpen, setKnowledgeOpen] = React.useState(false);
   const [authorCardOpen, setAuthorCardOpen] = React.useState(false);
+  const [astralModalOpen, setAstralModalOpen] = React.useState(false);
+  const [astralData, setAstralData] = React.useState<{
+    name: string;
+    date: Date;
+    city: string;
+    state: string;
+    country: string;
+  } | null>(null);
 
   React.useEffect(() => {
     setMounted(true);
@@ -34,6 +43,18 @@ export default function Home() {
     refetch
   } = usePlanetPositions();
 
+  const handleGenerateAstralMap = React.useCallback((data: NonNullable<typeof astralData>) => {
+    setAstralData(data);
+    setDate(data.date);
+    setIsPlaying(false);
+  }, [setDate, setIsPlaying]);
+
+  const handleResetToToday = React.useCallback(() => {
+    setAstralData(null);
+    setDate(new Date());
+    setIsPlaying(true);
+  }, [setDate, setIsPlaying]);
+
   if (!mounted) {
     return (
       <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-center items-center min-h-screen">
@@ -52,6 +73,29 @@ export default function Home() {
   return (
     <main className="flex-1 w-full max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-6 flex flex-col justify-between space-y-4 md:space-y-6 min-h-screen overflow-x-hidden">
       
+      {/* Print-only layout header */}
+      {astralData && (
+        <div className="hidden print-only flex-col items-center justify-center text-center pb-6 border-b border-gray-300 mb-6 text-black">
+          <h1 className="text-3xl font-extrabold uppercase tracking-widest text-black font-outfit">
+            AstroClock
+          </h1>
+          <p className="text-sm font-semibold tracking-wider text-gray-600 uppercase mt-1">
+            Mapa Astral de Nascimento
+          </p>
+          <div className="mt-4 px-6 py-3 border border-gray-300 rounded-xl bg-gray-50 max-w-xl text-center">
+            <p className="text-lg font-bold text-gray-800">
+              {astralData.name}
+            </p>
+            <p className="text-xs text-gray-600 mt-1 font-mono">
+              Data: {astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR')}
+            </p>
+            <p className="text-xs text-gray-600 mt-0.5 font-mono">
+              Local: {astralData.city}, {astralData.state} - {astralData.country}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 1. Header Navigation Glassmorphic Panel */}
       <header className="glass-panel rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left side: Knowledge button + Title Brand */}
@@ -101,6 +145,43 @@ export default function Home() {
           )}
         </div>
       </header>
+
+      {/* 1.5 Astral Map Pilgrim details panel */}
+      {astralData && (
+        <div className="glass-panel rounded-2xl px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-purple-950/30 via-pink-950/20 to-purple-950/30 border border-pink-500/20 shadow-lg shadow-pink-500/5 animate-fade-in no-print">
+          <div className="flex items-center space-x-4">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/20 shrink-0">
+              <Sparkles className="text-white w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold font-outfit uppercase tracking-widest text-pink-300">
+                Mapa Astral de {astralData.name}
+              </h2>
+              <p className="text-xs text-purple-200 mt-0.5 leading-relaxed">
+                Nascimento: <strong className="text-purple-100">{astralData.date.toLocaleDateString('pt-BR')} às {astralData.date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</strong>
+                <span className="mx-2 text-purple-500">•</span>
+                Local: <strong className="text-purple-100">{astralData.city}, {astralData.state} - {astralData.country}</strong>
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-purple-600 hover:bg-purple-500 border border-purple-400/30 text-white transition-all cursor-pointer shadow-md"
+            >
+              <Printer size={13} />
+              <span>Imprimir</span>
+            </button>
+            <button
+              onClick={handleResetToToday}
+              className="flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/20 text-purple-300 hover:text-purple-100 transition-all cursor-pointer"
+            >
+              <RotateCcw size={13} />
+              <span>Voltar ao Hoje</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 2. Main Content Grid (Central Wheel vs Sidebar) */}
       <div className="grid grid-cols-12 gap-6 items-start flex-1 w-full">
@@ -167,12 +248,20 @@ export default function Home() {
       <KnowledgeDrawer
         isOpen={knowledgeOpen}
         onClose={() => setKnowledgeOpen(false)}
+        onOpenAstralMap={() => setAstralModalOpen(true)}
       />
 
       {/* 6. Author Card */}
       <AuthorCard
         isOpen={authorCardOpen}
         onClose={() => setAuthorCardOpen(false)}
+      />
+
+      {/* 7. Astral Map Modal */}
+      <AstralMapModal
+        isOpen={astralModalOpen}
+        onClose={() => setAstralModalOpen(false)}
+        onGenerate={handleGenerateAstralMap}
       />
 
     </main>

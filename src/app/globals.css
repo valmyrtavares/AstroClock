@@ -215,3 +215,93 @@ body {
   background-size: 200% auto;
   animation: gold-shimmer 4s ease-in-out infinite;
 }
+
+/* ==========================================================================
+   Print Layout Styles for High-Quality Birth Charts
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Hide background starry elements and ambient glows */
+  .stars-bg,
+  .stars-bg-dense,
+  .nebula-purple,
+  .nebula-pink,
+  #ambient-stars,
+  #ambient-stars-dense,
+  #ambient-nebula-1,
+  #ambient-nebula-2 {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide non-printable interactive controls and navigation */
+  header,
+  footer,
+  aside,
+  button,
+  .no-print,
+  .glass-panel:not(.print-only) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Reset main layout container for print spacing */
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  /* Ensure print header is beautifully visible */
+  .print-only {
+    display: flex !important;
+  }
+
+  /* Hide sidebar in print so the wheel takes center stage */
+  .col-span-12.lg\:col-span-4 {
+    display: none !important;
+  }
+
+  /* Center the Zodiac Wheel container and style it cleanly */
+  .col-span-12.lg\:col-span-8 {
+    grid-column: span 12 / span 12 !important;
+    width: 100% !important;
+    max-width: 580px !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  /* Ensure all SVG paths, text, circles are dark/high-contrast for physical printing */
+  svg text {
+    fill: #111111 !important;
+    text-shadow: none !important;
+  }
+
+  svg circle,
+  svg line,
+  svg path {
+    stroke: #333333 !important;
+    stroke-opacity: 0.85 !important;
+  }
+
+  /* Maintain aspect ratio and size of zodiac SVGs in print */
+  svg {
+    max-height: 100% !important;
+    max-width: 100% !important;
+  }
+}
+

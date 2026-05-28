@@ -6,6 +6,7 @@ import { X, BookOpen, ChevronDown, Compass, Zap, RotateCcw, Globe2, Sparkles, Ma
 interface KnowledgeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenAstralMap: () => void;
 }
 
 interface TopicSection {
@@ -142,7 +143,7 @@ O que antes exigia consultar livros de centenas de páginas, o AstroClock oferec
   },
 ];
 
-export function KnowledgeDrawer({ isOpen, onClose }: KnowledgeDrawerProps) {
+export function KnowledgeDrawer({ isOpen, onClose, onOpenAstralMap }: KnowledgeDrawerProps) {
   const [expandedTopic, setExpandedTopic] = React.useState<string | null>(null);
   const [isClosing, setIsClosing] = React.useState(false);
 
@@ -209,7 +210,21 @@ export function KnowledgeDrawer({ isOpen, onClose }: KnowledgeDrawerProps) {
         </div>
 
         {/* Topics list */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          {/* Astral Map Button */}
+          <div className="pb-1">
+            <button
+              onClick={() => {
+                onOpenAstralMap();
+                handleClose();
+              }}
+              className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-xs font-bold tracking-wide uppercase transition-all duration-300 bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-500 hover:from-purple-500 hover:via-fuchsia-500 hover:to-pink-400 border border-purple-400/30 hover:border-pink-300/50 text-white shadow-lg shadow-purple-500/20 group cursor-pointer"
+            >
+              <Sparkles size={14} className="text-white group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Faça o seu Mapa Astral</span>
+            </button>
+          </div>
+
           {TOPICS.map((topic) => {
             const isExpanded = expandedTopic === topic.id;
 
